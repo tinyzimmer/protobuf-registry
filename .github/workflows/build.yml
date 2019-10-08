@@ -19,6 +19,9 @@ jobs:
     - name: Download module dependencies
       run: go mod download
 
+    - name: License Check
+      run: make license-check
+
     - name: Lint
       run: make lint
 
