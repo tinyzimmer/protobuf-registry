@@ -51,7 +51,25 @@ Example Payload
 	},
 
 	"/api/proto/{name}/{version}/{language}": {
-		"GET": `Download version {version} of spec {name} in language {language}`,
+		"GET": `Download version {version} of spec {name} in language {language}
+
+Example
+-------
+> curl -JLO http://protoregistry.example.com/api/proto/my-app-protocol/0.0.1/descriptors
+
+{language} options
+------------------
+raw (zip archive containing raw .proto files)
+descriptors (descriptor set)
+cpp
+csharp
+java
+javanano
+js
+objc
+php
+python
+ruby`,
 	},
 
 	"/api/proto/{name}/{version}/raw/{filename}": {

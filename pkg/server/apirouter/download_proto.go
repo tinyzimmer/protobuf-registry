@@ -57,6 +57,14 @@ func (api *apiServer) downloadProtoHandler(w http.ResponseWriter, r *http.Reques
 	if language == "raw" {
 		common.ServeFile(w, r, proto.RawFilename(), proto.RawReader())
 		return
+	} else if language == "descriptors" {
+		out, err := proto.CompileDescriptorSet()
+		if err != nil {
+			common.BadRequest(err, w)
+			return
+		}
+		common.ServeFile(w, r, fmt.Sprintf("%s-%s-descriptors.pb", *proto.Name, *proto.Version), bytes.NewReader(out))
+		return
 	}
 
 	target, err := getCompileTarget(language)

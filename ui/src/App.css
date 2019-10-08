@@ -73,10 +73,10 @@ thead {
   justify-content: flex-start;
 }
 
-.wiggle {
-  animation: wiggle-rotate $pt-transition-duration $pt-transition-ease infinite;
-}
-
 .form-control {
   background-color:  #d1d1d1;
+}
+
+.react-bootstrap-table-pagination-total {
+  color: white;
 }

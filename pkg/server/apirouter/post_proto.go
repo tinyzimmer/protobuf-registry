@@ -86,7 +86,7 @@ func (api *apiServer) postProtoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// make sure it compiles
-	if err := proto.Compile(); err != nil {
+	if _, err := proto.CompileDescriptorSet(); err != nil {
 		common.BadRequest(err, w)
 		return
 	}

@@ -41,6 +41,7 @@ export const TableColumns = [
     text: 'Name',
     dataField: 'name',
     sort: true,
+    sortValue: (cell, row) => row.rawName,
     align: 'left'
   },
   {text: 'Latest', dataField: 'latest' },

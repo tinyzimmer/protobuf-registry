@@ -29,15 +29,15 @@ import (
 	"github.com/tinyzimmer/proto-registry/pkg/config"
 )
 
-func (p *Protobuf) Compile() error {
+func (p *Protobuf) CompileDescriptorSet() ([]byte, error) {
 	tempPath, tempFiles, remove, err := p.newTempFilesFromRaw()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer remove()
 	tempOut, err := ioutil.TempDir("", "")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer os.RemoveAll(tempOut)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.GlobalConfig.CompileTimeout)*time.Second)
@@ -45,7 +45,7 @@ func (p *Protobuf) Compile() error {
 	args := []string{
 		fmt.Sprintf("-I=%s", tempPath),
 		"--include_imports",
-		fmt.Sprintf("--descriptor_set_out=%s/descriptor.pb", tempOut),
+		fmt.Sprintf("--descriptor_set_out=%s", filepath.Join(tempOut, "descriptor.pb")),
 	}
 	args = append(args, tempFilesToStrings(tempFiles)...)
 	out, err := exec.CommandContext(ctx,
@@ -53,9 +53,9 @@ func (p *Protobuf) Compile() error {
 		args...,
 	).CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to compile protocol spec: %s", string(out))
+		return nil, fmt.Errorf("failed to compile protocol spec: %s", string(out))
 	}
-	return nil
+	return ioutil.ReadFile(filepath.Join(tempOut, "descriptor.pb"))
 }
 
 type CompileTarget int
