@@ -7,30 +7,27 @@ import ServerConfig from './components/server-config.jsx';
 import APIDoc from './components/api-doc.jsx';
 import ProtoBrowser from './components/proto-browser.jsx';
 
-// uncomment the below to point API server at a seperate instance when using `npm run start`
-//const apiURL = 'http://localhost:8080';
-const apiURL = '';
 
 function App() {
   return (
     <div className="App">
       <Router>
         <div>
-          <RegistryNavBar apiURL={apiURL} />
+          <RegistryNavBar />
           <br></br>
           <div style={{paddingLeft: '3em', paddingRight: '3em'}}>
             <Switch>
               <Route exact path="/">
-                <ProtobufTable apiURL={apiURL} />
+                <ProtobufTable />
               </Route>
               <Route exact path="/config">
-                <ServerConfig apiURL={apiURL} />
+                <ServerConfig />
               </Route>
               <Route exact path="/apidoc">
-                <APIDoc apiURL={apiURL} />
+                <APIDoc />
               </Route>
               <Route exact path="/browser">
-                <ProtoBrowser apiURL={apiURL} />
+                <ProtoBrowser />
               </Route>
             </Switch>
           </div>

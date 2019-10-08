@@ -17,7 +17,7 @@ class ProtoDownloadButton extends React.Component {
   constructor(props) {
     super(props);
     this.buttonText = props.buttonText;
-    this.downloadRoot = props.apiURL + '/api/proto/' + props.name + '/' + props.version + '/'
+    this.downloadRoot = '/api/proto/' + props.name + '/' + props.version + '/'
     this.state = {
       downloadURL: this.downloadRoot + 'raw'
     }

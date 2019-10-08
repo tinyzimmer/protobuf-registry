@@ -11,14 +11,13 @@ const Header = () => {
 class ServerConfig extends Component {
   constructor(props) {
     super(props);
-    this.apiURL = props.apiURL
     this.state = {
       configStr: ""
     };
   }
 
   componentDidMount() {
-    fetch(this.apiURL + '/api/config')
+    fetch('/api/config')
     .then(result => {
       return result.text();
     }).then(data => {

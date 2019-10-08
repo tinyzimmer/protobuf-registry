@@ -7,7 +7,6 @@ import DeleteButton from './version-delete.jsx';
 class VersionMenu extends React.Component {
   constructor(props) {
     super(props);
-    this.apiURL = props.apiURL;
     this.meta = props.meta;
     this.state = {
       isOpen: false,
@@ -65,10 +64,10 @@ class VersionMenu extends React.Component {
                 {this.state.versions.map((value, index) => {
                   return (
                     <tr key={value.version}>
-                      <td><DeleteButton apiURL={this.apiURL} callback={this.handleVersionDeleted} name={value.name} version={value.version}></DeleteButton></td>
+                      <td><DeleteButton callback={this.handleVersionDeleted} name={value.name} version={value.version}></DeleteButton></td>
                       <td><Tag icon="git-branch" large>{value.version}</Tag></td>
                       <td>{new Date(value.lastUpdated).toString().replace(/\(.*\)/, '')}</td>
-                      <td><ProtoDownloadButton apiURL={this.apiURL} buttonText="Download" name={value.name} version={value.version}/></td>
+                      <td><ProtoDownloadButton buttonText="Download" name={value.name} version={value.version}/></td>
                     </tr>
                   );
                 })}

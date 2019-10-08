@@ -41,7 +41,7 @@ function getBase64(file) {
 class UploadForm extends React.Component {
   constructor(props) {
     super(props);
-    this.postURL = props.apiURL + '/api/proto'
+    this.postURL = '/api/proto'
     this.state = {
       isOpen: false,
       fileInputText: "Choose file...",

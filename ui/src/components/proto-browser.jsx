@@ -12,7 +12,6 @@ const Header = () => {
 class ProtoBrowser extends Component {
   constructor(props) {
     super(props);
-    this.apiURL = props.apiURL
     this.state = {
       nodes: [],
       fileViewHidden: true,
@@ -28,7 +27,7 @@ class ProtoBrowser extends Component {
   }
 
   handleFileClick(nodeData) {
-    fetch(this.apiURL + '/api/proto/' + nodeData.parent + '/' + nodeData.version + '/raw/' + nodeData.label)
+    fetch('/api/proto/' + nodeData.parent + '/' + nodeData.version + '/raw/' + nodeData.label)
     .then(results => {
       return results.text()
     }).then(fileText => {
@@ -56,7 +55,7 @@ class ProtoBrowser extends Component {
   }
 
   handleVersionExpand(nodeData) {
-    fetch(this.apiURL + '/api/proto/' + nodeData.parent + '/' + nodeData.label)
+    fetch('/api/proto/' + nodeData.parent + '/' + nodeData.label)
     .then(results => {
       return results.json()
     }).then(data => {
@@ -97,7 +96,7 @@ class ProtoBrowser extends Component {
   }
 
   componentDidMount() {
-    fetch(this.apiURL + '/api/proto')
+    fetch('/api/proto')
     .then(results => {
       return results.json()
     }).then(data => {

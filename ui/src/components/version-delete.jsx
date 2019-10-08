@@ -7,11 +7,10 @@ const toaster = Toaster.create()
 class DeleteButton extends React.Component {
   constructor(props) {
     super(props);
-    this.apiURL = props.apiURL;
     this.name = props.name;
     this.version = props.version;
     this.callback = props.callback;
-    this.deleteURL = this.apiURL + '/api/proto/' + this.name
+    this.deleteURL = '/api/proto/' + this.name
     if (this.version !== '*') {
       this.deleteURL = this.deleteURL + '/' + this.version
     }

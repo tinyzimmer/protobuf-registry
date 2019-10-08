@@ -51,14 +51,13 @@ class DocCollapse extends React.Component {
 class APIDoc extends Component {
   constructor(props) {
     super(props);
-    this.apiURL = props.apiURL
     this.state = {
       routes: [],
     };
   }
 
   componentDidMount() {
-    fetch(this.apiURL + '/api')
+    fetch('/api')
     .then(result => {
       return result.json();
     }).then(data => {

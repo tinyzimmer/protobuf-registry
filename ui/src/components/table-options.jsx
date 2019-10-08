@@ -46,6 +46,5 @@ export const TableColumns = [
   {text: 'Latest', dataField: 'latest'},
   {text: 'Uploaded', dataField: 'latestUploaded'},
   {text: '', dataField: 'details'},
-  {text: '', dataField: 'download'},
   {text: '', dataField: 'rawName', hidden: true}
 ]

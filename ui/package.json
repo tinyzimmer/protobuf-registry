@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "/ui",
+  "proxy": "http://localhost:8080",
   "dependencies": {
     "@blueprintjs/core": "^3.19.0",
     "@blueprintjs/table": "^3.8.0",

@@ -7,7 +7,6 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import { Tag } from "@blueprintjs/core";
 
 import ProtobufMenu from './protobuf-menu.jsx';
-import ProtoDownloadButton from './proto-download-button.jsx';
 import DeleteButton from './version-delete.jsx';
 
 const { SearchBar } = Search;
@@ -15,7 +14,7 @@ const { SearchBar } = Search;
 const nameTag = (parent, data) => {
   return (
     <div className="wrapper">
-      <DeleteButton apiURL={parent.apiURL} name={data.name} version="*" callback={parent.deleteCallback} />
+      <DeleteButton name={data.name} version="*" callback={parent.deleteCallback} />
       &nbsp;&nbsp;
       <Tag icon="comment" large>{data.name}</Tag>
   </div>
@@ -25,7 +24,6 @@ const nameTag = (parent, data) => {
 class ProtobufTable extends Component {
   constructor(props) {
     super(props)
-    this.apiURL = props.apiURL;
     this.state = {data: []}
     this.deleteCallback = this.deleteCallback.bind(this)
   }
@@ -42,7 +40,7 @@ class ProtobufTable extends Component {
   }
 
   componentDidMount() {
-    fetch(this.apiURL + '/api/proto')
+    fetch('/api/proto')
     .then(results => {
       return results.json()
     }).then(data => {
@@ -52,8 +50,7 @@ class ProtobufTable extends Component {
           name: nameTag(this, value),
           latest: <Tag icon="git-branch" large>{value.latest}</Tag>,
           latestUploaded: new Date(value.latestUploaded).toString().replace(/\(.*\)/, ''),
-          details: <ProtobufMenu apiURL={this.apiURL} meta={value} />,
-          download: <ProtoDownloadButton apiURL={this.apiURL} buttonText="Download Latest" name={value.name} version={value.latest} />,
+          details: <ProtobufMenu meta={value} />,
           rawName: value.name,
         });
         return ''
