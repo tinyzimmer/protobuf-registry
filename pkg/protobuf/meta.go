@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 
 	"github.com/jhump/protoreflect/desc"
 )
@@ -63,16 +64,25 @@ func parseMessageFields(fields []*desc.FieldDescriptor) map[string]string {
 	return fieldData
 }
 
-func (p *Protobuf) FileContents(filename string) ([]byte, error) {
+func (p *Protobuf) Contents(filename string) ([]byte, error) {
 	// write raw proto to temp files
-	_, tempFiles, remove, err := p.newTempFilesFromRaw()
+	tempPath, filesInfo, remove, err := p.newTempFilesFromRaw()
 	if err != nil {
 		return nil, err
 	}
 	defer remove()
-	for _, file := range tempFiles {
-		if filepath.Base(file) == filename {
-			return ioutil.ReadFile(file)
+
+	for dir, files := range filesInfo {
+		rawDir := strings.TrimPrefix(strings.Replace(dir, tempPath, "", 1), "/")
+		for _, x := range files {
+			if len(strings.Split(filename, "/")) == 1 {
+				if x.Name() == filename {
+					return ioutil.ReadFile(filepath.Join(dir, x.Name()))
+				}
+			}
+			if rawDir == filepath.Dir(filename) && x.Name() == filepath.Base(filename) {
+				return ioutil.ReadFile(filepath.Join(dir, x.Name()))
+			}
 		}
 	}
 	return nil, fmt.Errorf("No file %s in this protobuf package", filename)

@@ -27,44 +27,51 @@ import (
 	"strings"
 )
 
-func WriteZipFilesToTempDir(files []*zip.File) (path string, filenames []string, err error) {
+func WriteZipFilesToTempDir(files []*zip.File) (path string, dirs map[string][]os.FileInfo, err error) {
 	path, err = ioutil.TempDir("", "")
 	if err != nil {
 		return
 	}
-	filenames = make([]string, 0)
+	dirs = make(map[string][]os.FileInfo)
 	for _, f := range files {
 		fpath := filepath.Join(path, f.Name)
-		filenames = append(filenames, fpath)
+
+		dirName := filepath.Dir(fpath)
+		if _, ok := dirs[dirName]; !ok {
+			dirs[dirName] = make([]os.FileInfo, 0)
+		}
+
+		dirs[dirName] = append(dirs[dirName], f.FileInfo())
+
 		// Check for ZipSlip. More Info: http://bit.ly/2MsjAWE
 		if !strings.HasPrefix(fpath, filepath.Clean(path)+string(os.PathSeparator)) {
-			return path, filenames, fmt.Errorf("%s: illegal file path", fpath)
+			return path, dirs, fmt.Errorf("%s: illegal file path", fpath)
 		}
 
 		if f.FileInfo().IsDir() {
 			// Make Folder
 			if err := os.MkdirAll(fpath, os.ModePerm); err != nil {
-				return path, filenames, err
+				return path, dirs, err
 			}
 			continue
 		}
 		// Make File
 		if err = os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
-			return path, filenames, err
+			return path, dirs, err
 		}
 
 		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 		if err != nil {
-			return path, filenames, err
+			return path, dirs, err
 		}
 
 		rc, err := f.Open()
 		if err != nil {
-			return path, filenames, err
+			return path, dirs, err
 		}
 
 		if _, err = io.Copy(outFile, rc); err != nil {
-			return path, filenames, err
+			return path, dirs, err
 		}
 
 		// Close the file without defer to close before next iteration of loop

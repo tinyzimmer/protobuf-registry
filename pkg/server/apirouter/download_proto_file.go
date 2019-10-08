@@ -19,22 +19,23 @@ package apirouter
 
 import (
 	"net/http"
+	"strings"
 
-	"github.com/gorilla/mux"
 	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
 	"github.com/tinyzimmer/proto-registry/pkg/server/common"
 )
 
-func getFilename(r *http.Request) string {
-	vars := mux.Vars(r)
-	return vars["filename"]
+func getFileVars(r *http.Request) (name, version, filename string) {
+	name = common.GetName(r)
+	version = common.GetVersion(r)
+	pathSplit := strings.Split(r.URL.Path, "/raw/")
+	filename = pathSplit[len(pathSplit)-1]
+	return name, version, filename
 }
 
 func (api *apiServer) getRawProtoFile(w http.ResponseWriter, r *http.Request) {
 	var err error
-	name := common.GetName(r)
-	version := common.GetVersion(r)
-	filename := getFilename(r)
+	name, version, filename := getFileVars(r)
 	var protos []*protobuf.Protobuf
 	if protos, err = api.DB().GetProtoVersions(name); err != nil {
 		common.BadRequest(err, w)
@@ -49,7 +50,7 @@ func (api *apiServer) getRawProtoFile(w http.ResponseWriter, r *http.Request) {
 		common.BadRequest(err, w)
 		return
 	}
-	out, err := proto.FileContents(filename)
+	out, err := proto.Contents(filename)
 	if err != nil {
 		common.BadRequest(err, w)
 	}

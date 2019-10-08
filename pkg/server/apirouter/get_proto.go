@@ -91,6 +91,7 @@ func (api *apiServer) getProtoVersionMetaHandler(w http.ResponseWriter, r *http.
 	out, err := proto.Descriptors()
 	if err != nil {
 		common.BadRequest(err, w)
+		return
 	}
 	common.WriteJSONResponse(out, w)
 }

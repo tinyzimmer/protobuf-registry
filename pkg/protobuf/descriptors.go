@@ -19,6 +19,7 @@ package protobuf
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
@@ -57,7 +58,7 @@ func (p *Protobuf) Descriptors() (*ProtobufDescriptors, error) {
 	}
 	for _, x := range descriptors {
 		out = appendPkgsFromDescriptor(out, x)
-		out.SourceFiles = append(out.SourceFiles, filepath.Base(x.GetName()))
+		out.SourceFiles = append(out.SourceFiles, strings.TrimPrefix(x.GetName(), "/"))
 		for _, msg := range x.GetMessageTypes() {
 			out.Messages = append(out.Messages, protoMessageFromDescriptor(msg))
 		}
@@ -79,19 +80,43 @@ func (p *Protobuf) GetDescriptors() ([]*desc.FileDescriptor, error) {
 		return nil, err
 	}
 	defer remove()
-
 	// create a protoparser
 	parser := protoparse.Parser{ImportPaths: []string{tempPath}, InferImportPaths: true}
 	files := make([]string, 0)
 	// protoparse wants only the basename of the file when using ImportPaths
-	for _, x := range tempFiles {
-		files = append(files, filepath.Base(x))
+	for dir, fileInfo := range tempFiles {
+		for _, file := range fileInfo {
+			if !file.IsDir() {
+				stripDir := strings.Replace(dir, tempPath, "", 1)
+				var fileName string
+				if stripDir == "" {
+					fileName = file.Name()
+				} else {
+					fileName = filepath.Join(stripDir, file.Name())
+				}
+				files = append(files, fileName)
+			}
+		}
 	}
 	// parse the files
-	descriptors, err := parser.ParseFiles(files...)
-	if err != nil {
-		return nil, err
+	descriptors := make([]*desc.FileDescriptor, 0)
+	for _, file := range files {
+		descr, err := parser.ParseFiles(file)
+		if err != nil {
+			if strings.Contains(err.Error(), "already defined") {
+				if len(descr) > 0 {
+					descriptors = append(descriptors, descr...)
+				}
+				continue
+			}
+			return nil, err
+		}
+		descriptors = append(descriptors, descr...)
 	}
+	// descriptors, err = parser.ParseFiles(files...)
+	// if err != nil {
+	// 	return nil, err
+	// }
 	// set response to cache
 	p.descriptors = descriptors
 	return descriptors, err

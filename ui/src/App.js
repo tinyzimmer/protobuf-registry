@@ -15,7 +15,7 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <div >
+        <div>
           <RegistryNavBar apiURL={apiURL} />
           <br></br>
           <div style={{paddingLeft: '3em', paddingRight: '3em'}}>

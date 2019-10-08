@@ -47,7 +47,7 @@ func (p *Protobuf) Compile() error {
 		"--include_imports",
 		fmt.Sprintf("--descriptor_set_out=%s/descriptor.pb", tempOut),
 	}
-	args = append(args, tempFiles...)
+	args = append(args, tempFilesToStrings(tempFiles)...)
 	out, err := exec.CommandContext(ctx,
 		config.GlobalConfig.ProtocPath,
 		args...,
@@ -132,7 +132,7 @@ func (p Protobuf) CompileTo(target CompileTarget, prefix string) (tempOut string
 		fmt.Sprintf("-I=%s", rawPath),
 		fmt.Sprintf("%s=%s", getTargetArg(target), out),
 	}
-	args = append(args, tempFiles...)
+	args = append(args, tempFilesToStrings(tempFiles)...)
 
 	cmdout, err := exec.CommandContext(ctx,
 		config.GlobalConfig.ProtocPath,
@@ -143,4 +143,16 @@ func (p Protobuf) CompileTo(target CompileTarget, prefix string) (tempOut string
 		return "", nil, fmt.Errorf("failed to compile protocol spec: %s", string(cmdout))
 	}
 	return tempOut, rm, nil
+}
+
+func tempFilesToStrings(in map[string][]os.FileInfo) []string {
+	out := make([]string, 0)
+	for dir, files := range in {
+		for _, file := range files {
+			if !file.IsDir() {
+				out = append(out, filepath.Join(dir, file.Name()))
+			}
+		}
+	}
+	return out
 }

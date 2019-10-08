@@ -14,7 +14,7 @@ random-version() {
 }
 
 zip-proto() {
-  cd hack/test_protobuf && zip proto.zip *.proto && cd ../..
+  cd hack/test_protobuf && zip -r proto.zip * && cd ../..
 }
 
 clean() {

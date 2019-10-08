@@ -38,12 +38,12 @@ func (p *Protobuf) rawZipFiles() ([]*zip.File, error) {
 	return reader.File, nil
 }
 
-func (p *Protobuf) newTempFilesFromRaw() (path string, filenames []string, rm func(), err error) {
+func (p *Protobuf) newTempFilesFromRaw() (path string, filesInfo map[string][]os.FileInfo, rm func(), err error) {
 	var files []*zip.File
 	if files, err = p.rawZipFiles(); err != nil {
 		return
 	}
-	if path, filenames, err = util.WriteZipFilesToTempDir(files); err != nil {
+	if path, filesInfo, err = util.WriteZipFilesToTempDir(files); err != nil {
 		return
 	}
 	rm = func() {

@@ -66,7 +66,7 @@ func RegisterRoutes(router *mux.Router, path string, ctrl *common.ServerControll
 		api.downloadProtoHandler).
 		Methods("GET")
 
-	apiRouter.HandleFunc("/proto/{name}/{version}/raw/{filename}",
+	apiRouter.PathPrefix("/proto/{name}/{version}/raw/{filename}").HandlerFunc(
 		api.getRawProtoFile).
 		Methods("GET")
 

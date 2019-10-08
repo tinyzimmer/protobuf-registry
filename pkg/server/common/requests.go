@@ -67,7 +67,7 @@ func WriteRawResponse(out []byte, w http.ResponseWriter) {
 	if config.GlobalConfig.CORSEnabled {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 	}
-	w.WriteHeader(http.StatusOK)
+	// w.WriteHeader(http.StatusOK)
 	if _, err := w.Write(append(out, "\n"...)); err != nil {
 		BadRequest(err, w)
 	}

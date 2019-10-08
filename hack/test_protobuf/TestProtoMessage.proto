@@ -3,7 +3,7 @@ syntax = "proto3";
 option java_package = "com.example.test.data";
 option java_outer_classname = "TestDataProtos";
 
-import "TestProtoMessageDetails.proto";
+import "details/TestProtoMessageDetails.proto";
 
 message TestProtoMessage {
     int32 messageId = 1;
