@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
+import { Divider } from '@blueprintjs/core';
 import RegistryNavBar from './components/registry-navbar.jsx';
 import ProtobufTable from './components/protobuf-table.jsx'
 import ServerConfig from './components/server-config.jsx';
@@ -14,7 +15,7 @@ function App() {
       <Router>
         <div>
           <RegistryNavBar />
-          <br></br>
+          <Divider></Divider>
           <div style={{paddingLeft: '2em', paddingRight: '2em'}}>
             <Switch>
               <Route exact path="/" component={ProtobufTable} />

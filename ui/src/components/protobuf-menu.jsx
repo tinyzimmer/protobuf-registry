@@ -11,10 +11,10 @@ class ProtobufMenu extends React.Component {
 
   render() {
     return (
-      <div className="wrapper">
+      <div className="wrapper bp3-dark">
         <VersionMenu meta={this.meta}></VersionMenu>
         &nbsp;&nbsp;
-        <ProtoDownloadButton buttonText="Download Latest" name={this.meta.name} version={this.meta.latest} />,
+        <ProtoDownloadButton buttonText="Download Latest" name={this.meta.name} version={this.meta.latest} />
       </div>
     );
   }

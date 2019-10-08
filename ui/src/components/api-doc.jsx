@@ -1,11 +1,13 @@
 import React, { Component } from "react";
-import { Button, Card, Elevation, Pre, Collapse } from "@blueprintjs/core";
+import { Button, Card, Elevation, Pre, Collapse, Divider } from "@blueprintjs/core";
 
 const Header = () => {
   return (
     <div>
-      <h4 className="font-weight-bold">API Index</h4>
-      <br></br>
+      <Card className="bp3-dark">
+        <h4 className="font-weight-bold">API Index</h4>
+      </Card>
+      <Divider></Divider>
     </div>
   )
 }

@@ -39,7 +39,7 @@ class VersionMenu extends React.Component {
   render() {
     var title = "Versions | " + this.meta.name
     return (
-      <Button icon="projects" text="Versions" onClick={this.handleOpen}>
+      <Button intent="primary" icon="projects" text="Versions" onClick={this.handleOpen}>
         <Dialog
           icon="info-sign"
           title={title}
@@ -50,6 +50,7 @@ class VersionMenu extends React.Component {
           canOutsideClickClose={true}
           isCloseButtonShown={false}
           style={{width:'800px'}}
+          className="bp3-dark"
         >
           <div className={Classes.DIALOG_BODY}>
             <HTMLTable>

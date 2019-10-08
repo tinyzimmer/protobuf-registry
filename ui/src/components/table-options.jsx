@@ -43,7 +43,7 @@ export const TableColumns = [
     sort: true,
     align: 'left'
   },
-  {text: 'Latest', dataField: 'latest'},
+  {text: 'Latest', dataField: 'latest' },
   {text: 'Uploaded', dataField: 'latestUploaded'},
   {text: '', dataField: 'details'},
   {text: '', dataField: 'rawName', hidden: true}

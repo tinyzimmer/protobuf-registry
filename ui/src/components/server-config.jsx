@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import { github } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { Card, Divider } from '@blueprintjs/core';
 
 const Header = () => {
   return (
-    <h4 className="font-weight-bold">Server Configuration</h4>
+    <h4>Server Configuration</h4>
   )
 }
 
@@ -29,8 +30,11 @@ class ServerConfig extends Component {
   render() {
     return (
       <div align="left" style={{paddingLeft: '10em', paddingRight: '10em'}}>
-        <Header />
-        <SyntaxHighlighter language="json" style={github}>
+        <Card className="bp3-dark" style={{width: '100%'}}>
+          <Header />
+        </Card>
+        <Divider></Divider>
+        <SyntaxHighlighter language="json" style={atomOneDark}>
           {this.state.configStr}
         </SyntaxHighlighter>
       </div>

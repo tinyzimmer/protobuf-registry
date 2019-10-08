@@ -188,6 +188,7 @@ class UploadForm extends React.Component {
           canOutsideClickClose={true}
           isCloseButtonShown={false}
           style={{width:'800px'}}
+          className="bp3-dark"
         >
           <div className={Classes.DIALOG_BODY}>
             <div className="upload-form-container">
@@ -225,12 +226,12 @@ class UploadForm extends React.Component {
                 <br></br>
                 <div className="upload-form-item">
                   <Button
-                    large
+                    intent="primary"
                     onClick={this.handleSubmit}
                     style={{width: "75px"}}
                      className={this.state.wiggling ? "wiggle" : ""}
                   >
-                    Submit
+                    Upload
                   </Button>
                 </div>
               </div>

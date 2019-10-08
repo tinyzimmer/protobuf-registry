@@ -1,11 +1,16 @@
 import React, { Component } from "react";
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import { solarizedDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { Classes, Tree, Card } from "@blueprintjs/core";
+import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { Classes, Tree, Card, Breadcrumbs, Icon, Divider } from "@blueprintjs/core";
 
 const Header = () => {
   return (
-    <h4 className="font-weight-bold">File Browser (super beta)</h4>
+    <div>
+      <Card className="bp3-dark">
+        <h4 className="font-weight-bold">Protocol Browser (super beta)</h4>
+      </Card>
+      <Divider></Divider>
+    </div>
   )
 }
 
@@ -25,6 +30,7 @@ function enumerateFiles(nodeData, cb) {
         icon: "document-open",
         label: value,
         isFile: true,
+        className: 'tree-node',
         parent: nodeData.parent,
         version: nodeData.version,
         fullPath: [nodeData.fullPath, value].join('/'),
@@ -47,6 +53,7 @@ function enumerateFiles(nodeData, cb) {
           icon: "folder-close",
           label: split[0],
           isDir: true,
+          className: 'tree-node',
           parent: nodeData.parent,
           version: nodeData.version,
           fullPath: [nodeData.fullPath, split[0]].join('/'),
@@ -69,6 +76,7 @@ class ProtoBrowser extends Component {
       fileViewHidden: true,
       fileText: "",
       fileTextHeader: "",
+      breadcrumbs: [],
     }
     this.handleFileClick = this.handleFileClick.bind(this)
     this.handleDirExpand = this.handleDirExpand.bind(this)
@@ -86,6 +94,20 @@ class ProtoBrowser extends Component {
     .then(results => {
       return results.text()
     }).then(fileText => {
+      var crumbs = [
+        { icon: 'globe-network', text: nodeData.parent },
+        { icon: 'git-merge', text: nodeData.version },
+      ]
+      nodeData.fullPath.split('/').map((value, index) => {
+        if (value === nodeData.label) {
+          return ''
+        } else if (value !== "") {
+          crumbs.push({ icon: 'folder-open', text: value })
+        }
+        return ''
+      })
+      crumbs.push({ icon: 'document-open', text: nodeData.label })
+      this.setState({breadcrumbs: crumbs})
       this.setState({fileText: fileText})
       this.setState({fileViewHidden: false})
     })
@@ -165,6 +187,7 @@ class ProtoBrowser extends Component {
           hasCaret: true,
           icon: "globe-network",
           label: value.name,
+          className: 'tree-node',
         }
         var children = []
         value.versions.map((version, i) => {
@@ -176,6 +199,7 @@ class ProtoBrowser extends Component {
             isVersion: true,
             version: version.version,
             parent: value.name,
+            className: 'tree-node',
           })
           return ''
         })
@@ -186,6 +210,10 @@ class ProtoBrowser extends Component {
       this.setState({nodes: nodes})
     })
   }
+
+  renderCurrentBreadcrumb({ text, ...restProps }) {
+    return <Breadcrumbs {...restProps}>{text} <Icon icon="star" /></Breadcrumbs>;
+  };
 
   render() {
     return (
@@ -199,13 +227,15 @@ class ProtoBrowser extends Component {
               onNodeClick={this.handleNodeClick}
               onNodeCollapse={this.handleNodeCollapse}
               onNodeExpand={this.handleNodeExpand}
-              className={Classes.ELEVATION_2}
+              className={Classes.TREE}
             />
           </div>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <div hidden={this.state.fileViewHidden} style={{width: '65%'}}>
             <Card elevation="3" className="bp3-dark" style={{width: '100%'}}>
-              <SyntaxHighlighter language="protobuf" style={solarizedDark}>
+              <Breadcrumbs currentBreadcumbRenderer={this.renderCurrentBreadcrumb} items={this.state.breadcrumbs} />
+              <br></br>
+              <SyntaxHighlighter language="protobuf" style={atomOneDark}>
                 {this.state.fileText}
               </SyntaxHighlighter>
             </Card>

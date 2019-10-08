@@ -4,7 +4,7 @@ import { PaginationOptions, TableColumns } from './table-options.jsx';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import { Tag } from "@blueprintjs/core";
+import { Tag, Card, Divider } from "@blueprintjs/core";
 
 import ProtobufMenu from './protobuf-menu.jsx';
 import DeleteButton from './version-delete.jsx';
@@ -49,7 +49,7 @@ class ProtobufTable extends Component {
         newRows.push({
           name: nameTag(this, value),
           latest: <Tag icon="git-branch" large>{value.latest}</Tag>,
-          latestUploaded: new Date(value.latestUploaded).toString().replace(/\(.*\)/, ''),
+          latestUploaded: <p style={{color: 'white'}}>{new Date(value.latestUploaded).toString().replace(/\(.*\)/, '')}</p>,
           details: <ProtobufMenu meta={value} />,
           rawName: value.name,
         });
@@ -73,8 +73,13 @@ class ProtobufTable extends Component {
       {
         props =>
           <div>
-            <strong><p align="center">Type to filter specs by name</p></strong>
-            <SearchBar align="center" { ...props.searchProps } />
+            <Card className="bp3-dark">
+              <div className="wrapper" align="center">
+                <strong>Filter protocols by name&nbsp;&nbsp;&nbsp;&nbsp;</strong>
+                <SearchBar { ...props.searchProps } />
+              </div>
+            </Card>
+            <Divider></Divider>
             <BootstrapTable
               { ...props.baseProps }
               bordered={false}

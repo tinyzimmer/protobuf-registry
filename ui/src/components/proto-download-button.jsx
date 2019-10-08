@@ -31,7 +31,7 @@ class ProtoDownloadButton extends React.Component {
   render() {
     return (
       <div className="wrapper">
-        <AnchorButton icon="download" href={this.state.downloadURL}>{this.buttonText}</AnchorButton>
+        <AnchorButton intent="primary" icon="download" href={this.state.downloadURL}>{this.buttonText}</AnchorButton>
         &nbsp;&nbsp;
         <div className="bp3-select">
           <select

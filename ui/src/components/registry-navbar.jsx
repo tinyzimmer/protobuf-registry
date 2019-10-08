@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Navbar, Alignment, Button } from '@blueprintjs/core';
+import { Navbar, Alignment, Button, Icon } from '@blueprintjs/core';
 import { Link } from 'react-router-dom';
 
 import UploadForm from './upload-form.jsx';
@@ -32,7 +32,7 @@ class RegistryNavBar extends Component {
     return (
       <Navbar className='bp3-dark'>
         <Navbar.Group align={Alignment.LEFT}>
-          <Navbar.Heading>Protobuf Registry</Navbar.Heading>
+          <Navbar.Heading><Icon icon="globe-network" intent="primary"></Icon>&nbsp;<strong>Protobuf Registry</strong></Navbar.Heading>
           <Navbar.Divider />
           <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
             <Button
