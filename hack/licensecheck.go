@@ -29,7 +29,10 @@ var licenseHeader = `// Copyright © 2019 tinyzimmer
 func main() {
 	missing := make([]string, 0)
 	for _, dir := range []string{"pkg/", "cmd/"} {
-		if err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err := filepath.Walk(dir, func(path string, info os.FileInfo, e error) error {
+			if e != nil {
+				return e
+			}
 			if info.IsDir() {
 				return nil
 			}
