@@ -1,0 +1,7 @@
+syntax = 'proto3';
+
+message TestProtoMessageMeta {
+  string someMeta = 1;
+  string moreMeta = 2;
+  int64 andMoreMeta = 3;
+}

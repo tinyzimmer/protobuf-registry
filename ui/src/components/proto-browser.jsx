@@ -9,17 +9,17 @@ const Header = () => {
   )
 }
 
-function enumerateFiles(nodeData, rawFiles, cb) {
+function enumerateFiles(nodeData, cb) {
   var files = []
   var directories = []
   var knownDirs = []
-  rawFiles.map((value, index) => {
+  nodeData.rawChildren.map((value, index) => {
     if (nodeData.isDir) {
       value = value.replace(nodeData.label+'/', '')
     }
     var split = value.split('/')
     if (split.length === 1) {
-      files.push({
+      var file = {
         id: index,
         hasCaret: false,
         icon: "document-open",
@@ -27,28 +27,32 @@ function enumerateFiles(nodeData, rawFiles, cb) {
         isFile: true,
         parent: nodeData.parent,
         version: nodeData.version,
-      })
+        fullPath: [nodeData.fullPath, value].join('/'),
+      }
+      files.push(file)
     } else {
       if (!knownDirs.includes(split[0])) {
         knownDirs.push(split[0])
         var rawChildren = []
-        rawFiles.map((v, i) => {
+        nodeData.rawChildren.map((v, i) => {
           var spl = v.split('/')
           if (spl[0] === split[0]) {
-            rawChildren.push(v)
+            rawChildren.push(v.replace(split[0] + '/', ''))
           }
           return ''
         })
-        directories.push({
+        var dir = {
           id: index,
           hasCaret: true,
           icon: "folder-close",
           label: split[0],
           isDir: true,
           parent: nodeData.parent,
-          version: nodeData.label,
+          version: nodeData.version,
+          fullPath: [nodeData.fullPath, split[0]].join('/'),
           rawChildren: rawChildren
-        })
+        }
+        directories.push(dir)
       }
     }
     return ''
@@ -76,8 +80,8 @@ class ProtoBrowser extends Component {
   }
 
   handleFileClick(nodeData) {
-    var url = '/api/proto/' + nodeData.parent + '/' + nodeData.version + '/raw/' + nodeData.label
-    console.log(url)
+    console.log(nodeData)
+    var url = '/api/proto/' + nodeData.parent + '/' + nodeData.version + '/raw' + nodeData.fullPath
     fetch(url)
     .then(results => {
       return results.text()
@@ -88,11 +92,10 @@ class ProtoBrowser extends Component {
   }
 
   handleDirExpand(nodeData) {
-    enumerateFiles(nodeData, nodeData.rawChildren, (directories, files) => {
+    enumerateFiles(nodeData, (directories, files) => {
       nodeData.childNodes = directories.concat(files)
       this.setState(this.state)
     })
-    console.log(nodeData)
   }
 
   handleNodeClick(nodeData, _nodePath, e) {
@@ -120,7 +123,9 @@ class ProtoBrowser extends Component {
     .then(results => {
       return results.json()
     }).then(data => {
-      enumerateFiles(nodeData, data.sourceFiles, (directories, files) => {
+      nodeData.rawChildren = data.sourceFiles
+      nodeData.fullPath = ''
+      enumerateFiles(nodeData, (directories, files) => {
         nodeData.childNodes = directories.concat(files)
         this.setState(this.state)
       })
@@ -160,7 +165,6 @@ class ProtoBrowser extends Component {
           hasCaret: true,
           icon: "globe-network",
           label: value.name,
-          isVersion: false,
         }
         var children = []
         value.versions.map((version, i) => {

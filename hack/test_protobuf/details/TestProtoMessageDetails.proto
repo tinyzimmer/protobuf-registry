@@ -1,7 +1,9 @@
 syntax = "proto3";
 
+import "details/meta/TestProtoMessageMeta.proto";
 
 message TestProtoMessageDetails {
   string eventType = 1;
   string eventName = 2;
+  TestProtoMessageMeta meta = 4;
 }
