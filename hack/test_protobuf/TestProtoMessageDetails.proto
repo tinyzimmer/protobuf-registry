@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+
+message TestProtoMessageDetails {
+  string eventType = 1;
+  string eventName = 2;
+}

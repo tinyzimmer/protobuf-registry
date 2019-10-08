@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "com.example.test.data";
+option java_outer_classname = "TestDataProtos";
+
+import "TestProtoMessageDetails.proto";
+
+message TestProtoMessage {
+    int32 messageId = 1;
+    int64 messageTime = 2;
+    TestProtoMessageDetails details = 3;
+}
