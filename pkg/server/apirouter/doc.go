@@ -55,7 +55,11 @@ Example Payload
 	},
 
 	"/api/proto/{name}/{version}/raw/{filename}": {
-		"GET": `Retrieve the raw contents of file {filename} from version {version} of package {name}`,
+		"GET": `Retrieve the raw contents of file {filename} from version {version} of package {name}
+
+{filename} can be a full path with slashes (/) for a nested file in a protobuf package. However, a path to a directory will currently return an error.
+
+This may be adapted to return a list of filenames when a directory is provided.`,
 	},
 
 	"/pip/{name}": {

@@ -9,6 +9,54 @@ const Header = () => {
   )
 }
 
+function enumerateFiles(nodeData, rawFiles, cb) {
+  var files = []
+  var directories = []
+  var knownDirs = []
+  rawFiles.map((value, index) => {
+    if (nodeData.isDir) {
+      value = value.replace(nodeData.label+'/', '')
+    }
+    var split = value.split('/')
+    if (split.length === 1) {
+      files.push({
+        id: index,
+        hasCaret: false,
+        icon: "document-open",
+        label: value,
+        isFile: true,
+        parent: nodeData.parent,
+        version: nodeData.version,
+      })
+    } else {
+      if (!knownDirs.includes(split[0])) {
+        knownDirs.push(split[0])
+        var rawChildren = []
+        rawFiles.map((v, i) => {
+          var spl = v.split('/')
+          if (spl[0] === split[0]) {
+            rawChildren.push(v)
+          }
+          return ''
+        })
+        directories.push({
+          id: index,
+          hasCaret: true,
+          icon: "folder-close",
+          label: split[0],
+          isDir: true,
+          parent: nodeData.parent,
+          version: nodeData.label,
+          rawChildren: rawChildren
+        })
+      }
+    }
+    return ''
+  })
+  cb(directories, files)
+}
+
+
 class ProtoBrowser extends Component {
   constructor(props) {
     super(props);
@@ -19,6 +67,7 @@ class ProtoBrowser extends Component {
       fileTextHeader: "",
     }
     this.handleFileClick = this.handleFileClick.bind(this)
+    this.handleDirExpand = this.handleDirExpand.bind(this)
     this.handleNodeClick = this.handleNodeClick.bind(this)
     this.handleNodeCollapse = this.handleNodeCollapse.bind(this)
     this.handleNodeExpand = this.handleNodeExpand.bind(this)
@@ -27,14 +76,23 @@ class ProtoBrowser extends Component {
   }
 
   handleFileClick(nodeData) {
-    fetch('/api/proto/' + nodeData.parent + '/' + nodeData.version + '/raw/' + nodeData.label)
+    var url = '/api/proto/' + nodeData.parent + '/' + nodeData.version + '/raw/' + nodeData.label
+    console.log(url)
+    fetch(url)
     .then(results => {
       return results.text()
     }).then(fileText => {
       this.setState({fileText: fileText})
-      this.setState({fileTextHeader: nodeData.parent + '/' + nodeData.version + '/' + nodeData.label})
       this.setState({fileViewHidden: false})
     })
+  }
+
+  handleDirExpand(nodeData) {
+    enumerateFiles(nodeData, nodeData.rawChildren, (directories, files) => {
+      nodeData.childNodes = directories.concat(files)
+      this.setState(this.state)
+    })
+    console.log(nodeData)
   }
 
   handleNodeClick(nodeData, _nodePath, e) {
@@ -50,6 +108,9 @@ class ProtoBrowser extends Component {
   };
 
   handleNodeCollapse(nodeData) {
+    if (nodeData.isDir) {
+      nodeData.icon = 'folder-close'
+    }
     nodeData.isExpanded = false;
     this.setState(this.state);
   }
@@ -59,27 +120,19 @@ class ProtoBrowser extends Component {
     .then(results => {
       return results.json()
     }).then(data => {
-      var children = []
-      data.sourceFiles.map((value, index) => {
-        children.push({
-          id: index,
-          hasCaret: false,
-          icon: "document-open",
-          label: value,
-          isFile: true,
-          parent: nodeData.parent,
-          version: nodeData.label,
-        })
-        return ''
+      enumerateFiles(nodeData, data.sourceFiles, (directories, files) => {
+        nodeData.childNodes = directories.concat(files)
+        this.setState(this.state)
       })
-      nodeData.childNodes = children
-      this.setState(this.state)
     })
   }
 
   handleNodeExpand(nodeData) {
     if (nodeData.isVersion) {
       this.handleVersionExpand(nodeData)
+    } else if (nodeData.isDir) {
+      nodeData.icon = 'folder-open'
+      this.handleDirExpand(nodeData)
     }
     nodeData.isExpanded = true;
     this.setState(this.state);
@@ -105,7 +158,7 @@ class ProtoBrowser extends Component {
         var node = {
           id: index,
           hasCaret: true,
-          icon: "folder-close",
+          icon: "globe-network",
           label: value.name,
           isVersion: false,
         }
@@ -117,6 +170,7 @@ class ProtoBrowser extends Component {
             icon: 'git-merge',
             label: version.version,
             isVersion: true,
+            version: version.version,
             parent: value.name,
           })
           return ''
@@ -131,11 +185,11 @@ class ProtoBrowser extends Component {
 
   render() {
     return (
-      <div align="left" style={{paddingLeft: '10em', paddingRight: '10em'}}>
+      <div align="left" style={{paddingLeft: '5em', paddingRight: '5em'}}>
         <Header />
         <br></br>
         <div className="wrapper">
-          <div style={{width: '25%'}}>
+          <div style={{width: '35%'}}>
             <Tree
               contents={this.state.nodes}
               onNodeClick={this.handleNodeClick}
@@ -145,10 +199,8 @@ class ProtoBrowser extends Component {
             />
           </div>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <div hidden={this.state.fileViewHidden}>
-            <Card elevation="3" className="bp3-dark">
-              <strong>{this.state.fileTextHeader}</strong>
-              <br></br><br></br>
+          <div hidden={this.state.fileViewHidden} style={{width: '65%'}}>
+            <Card elevation="3" className="bp3-dark" style={{width: '100%'}}>
               <SyntaxHighlighter language="protobuf" style={solarizedDark}>
                 {this.state.fileText}
               </SyntaxHighlighter>

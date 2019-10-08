@@ -15,20 +15,12 @@ function App() {
         <div>
           <RegistryNavBar />
           <br></br>
-          <div style={{paddingLeft: '3em', paddingRight: '3em'}}>
+          <div style={{paddingLeft: '2em', paddingRight: '2em'}}>
             <Switch>
-              <Route exact path="/">
-                <ProtobufTable />
-              </Route>
-              <Route exact path="/config">
-                <ServerConfig />
-              </Route>
-              <Route exact path="/apidoc">
-                <APIDoc />
-              </Route>
-              <Route exact path="/browser">
-                <ProtoBrowser />
-              </Route>
+              <Route exact path="/" component={ProtobufTable} />
+              <Route exact path="/config" component={ServerConfig} />
+              <Route exact path="/apidoc" component={APIDoc} />
+              <Route exact path="/browser" component={ProtoBrowser} />
             </Switch>
           </div>
         </div>
