@@ -18,6 +18,8 @@
 package apirouter
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/tinyzimmer/proto-registry/pkg/server/common"
 )
@@ -70,4 +72,14 @@ func RegisterRoutes(router *mux.Router, path string, ctrl *common.ServerControll
 		api.getRawProtoFile).
 		Methods("GET")
 
+	apiRouter.PathPrefix("/proto/{name}/{version}/meta/{filename}").HandlerFunc(
+		api.getMetaForProtoFile).
+		Methods("GET")
+
+}
+
+func (api *apiServer) getMetaForProtoFile(w http.ResponseWriter, r *http.Request) {
+	common.WriteJSONResponse(map[string]string{
+		"error": "not implemented",
+	}, w)
 }

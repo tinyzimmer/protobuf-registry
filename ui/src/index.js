@@ -11,7 +11,7 @@ import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-document.body.style.backgroundColor = '#182026f7';
+document.body.style.backgroundColor = '#182026e6';
 ReactDOM.render(<App />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change

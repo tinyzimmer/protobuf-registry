@@ -80,6 +80,12 @@ ruby`,
 This may be adapted to return a list of filenames when a directory is provided.`,
 	},
 
+	"/api/proto/{name}/{version}/meta/{filename}": {
+		"GET": `Not implemented yet.
+
+Will retrieve context-specific documentation for a protobuf file in the given package/version.`,
+	},
+
 	"/pip/{name}": {
 		"GET": `Used for pip discovery - returns a list of available packages for spec {name} as parsed by pip.
 

@@ -4,7 +4,7 @@ import { Button, Card, Elevation, Pre, Collapse, Divider } from "@blueprintjs/co
 const Header = () => {
   return (
     <div>
-      <Card className="bp3-dark">
+      <Card  elevation="4" className="bp3-dark">
         <h4 className="font-weight-bold">API Index</h4>
       </Card>
       <Divider></Divider>
@@ -37,9 +37,9 @@ class DocCollapse extends React.Component {
       icon = "cross"
     }
     return (
-      <Card className="bp3-dark" interactive={true} elevation={Elevation.THREE} onClick={this.handleClick}>
+      <Card className="bp3-dark" elevation={Elevation.THREE}>
         <div className="wrapper">
-          <Button small={true} intent={intent} icon={icon} text={this.state.data.method}></Button>
+          <Button intent={intent} icon={icon} text={this.state.data.method} onClick={this.handleClick}></Button>
           &nbsp;&nbsp;<strong>{this.state.data.path}</strong>
         </div>
         <Collapse isOpen={this.state.isOpen} keepChildrenMounted={true}>

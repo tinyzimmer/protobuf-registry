@@ -73,7 +73,7 @@ class ProtobufTable extends Component {
       {
         props =>
           <div>
-            <Card className="bp3-dark">
+            <Card elevation="4" className="bp3-dark">
               <div className="wrapper" align="center">
                 <strong>Filter protocols by name&nbsp;&nbsp;&nbsp;&nbsp;</strong>
                 <SearchBar { ...props.searchProps } />

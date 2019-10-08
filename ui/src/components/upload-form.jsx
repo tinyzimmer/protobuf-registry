@@ -41,6 +41,7 @@ function getBase64(file) {
 class UploadForm extends React.Component {
   constructor(props) {
     super(props);
+    this.remountFunc = props.remountFunc
     this.postURL = '/api/proto'
     this.state = {
       isOpen: false,
@@ -117,6 +118,7 @@ class UploadForm extends React.Component {
       );
       this.handleClose()
       this.clear()
+      this.remountFunc()
     }
   }
 

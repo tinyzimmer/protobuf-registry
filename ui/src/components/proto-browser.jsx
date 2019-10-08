@@ -6,7 +6,7 @@ import { Classes, Tree, Card, Breadcrumbs, Icon, Divider } from "@blueprintjs/co
 const Header = () => {
   return (
     <div>
-      <Card className="bp3-dark">
+      <Card elevation="4" className="bp3-dark" >
         <h4 className="font-weight-bold">Protocol Browser (super beta)</h4>
       </Card>
       <Divider></Divider>
@@ -222,6 +222,7 @@ class ProtoBrowser extends Component {
         <br></br>
         <div className="wrapper">
           <div style={{width: '35%'}}>
+            <Card elevation="3" className="bp3-dark">
             <Tree
               contents={this.state.nodes}
               onNodeClick={this.handleNodeClick}
@@ -229,6 +230,7 @@ class ProtoBrowser extends Component {
               onNodeExpand={this.handleNodeExpand}
               className={Classes.TREE}
             />
+            </Card>
           </div>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <div hidden={this.state.fileViewHidden} style={{width: '65%'}}>

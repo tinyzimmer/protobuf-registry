@@ -7,6 +7,7 @@ import UploadForm from './upload-form.jsx';
 class RegistryNavBar extends Component {
   constructor(props) {
     super(props);
+    this.remountFunc = props.remountFunc;
     this.state = {
       active: "Home"
     }
@@ -53,7 +54,7 @@ class RegistryNavBar extends Component {
             />
           </Link>
           <Navbar.Divider />
-          <UploadForm />
+          <UploadForm remountFunc={this.remountFunc} />
           <Navbar.Divider />
           <Link to="/apidoc" style={{ textDecoration: 'none', color: 'white' }}>
             <Button
