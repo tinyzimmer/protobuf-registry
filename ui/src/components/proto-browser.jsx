@@ -64,6 +64,8 @@ function enumerateFiles(nodeData, cb) {
     }
     return ''
   })
+  directories.sort((a, b) => (a.label > b.label) ? 1 : -1)
+  files.sort((a, b) => (a.label > b.label) ? 1 : -1)
   cb(directories, files)
 }
 
@@ -207,6 +209,7 @@ class ProtoBrowser extends Component {
         nodes.push(node)
         return ''
       });
+      nodes.sort((a, b) => (a.label > b.label) ? 1 : -1)
       this.setState({nodes: nodes})
     })
   }
