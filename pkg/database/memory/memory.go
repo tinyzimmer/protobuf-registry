@@ -55,7 +55,7 @@ func NewEngine(conf *config.Config) dbcommon.DBEngine {
 func (m *memoryDatabase) Init() error {
 	if m.persistToDisk {
 		if err := m.loadFromDisk(); err != nil {
-			log.Error(err, "Failed to load memdb")
+			log.Error(err, "Failed to load memdb, will continue and attempt to create a new one")
 		}
 	}
 	return nil

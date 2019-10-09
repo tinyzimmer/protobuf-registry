@@ -14,6 +14,8 @@ const Header = () => {
   )
 }
 
+const NodesPerPage = 15
+
 function enumerateFiles(nodeData, cb) {
   var files = []
   var directories = []
@@ -75,6 +77,9 @@ class ProtoBrowser extends Component {
     super(props);
     this.state = {
       nodes: [],
+      visibleNodes: [],
+      curStartIdx: 0,
+      curEndIdx: 0,
       fileViewHidden: true,
       fileText: "",
       fileTextHeader: "",
@@ -227,24 +232,24 @@ class ProtoBrowser extends Component {
         <div align="center" hidden={!this.state.loading}>
           <Spinner size={Spinner.SIZE_LARGE}></Spinner>
         </div>
+        <div hidden={this.state.nodes.length !== 0 || this.state.loading}>
+          <Card elevation="3" className="bp3-dark">
+            The registry is empty
+          </Card>
+        </div>
         <div align="left" style={{paddingLeft: '5em', paddingRight: '5em'}}>
           <br></br>
           <div className="wrapper">
-            <div hidden={this.state.nodes.length === 0 || this.state.loading} style={{width: '35%'}}>
-              <Card elevation="3" className="bp3-dark">
-              <Tree
-                contents={this.state.nodes}
-                onNodeClick={this.handleNodeClick}
-                onNodeCollapse={this.handleNodeCollapse}
-                onNodeExpand={this.handleNodeExpand}
-                className={Classes.TREE}
-              />
-              </Card>
-            </div>
-            <div hidden={this.state.nodes.length !== 0 || this.state.loading}>
-              <Card elevation="3" className="bp3-dark">
-                The registry is empty
-              </Card>
+            <div
+              hidden={this.state.nodes.length === 0 || this.state.loading}
+              style={{paddingRight: '2em', height: '700px', overflowX: 'hidden', overflowY: 'auto', display: 'flex', flexDirection: "row"}}>
+                <Tree
+                  contents={this.state.nodes}
+                  onNodeClick={this.handleNodeClick}
+                  onNodeCollapse={this.handleNodeCollapse}
+                  onNodeExpand={this.handleNodeExpand}
+                  className={Classes.TREE}
+                />
             </div>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <div hidden={this.state.fileViewHidden} style={{width: '65%'}}>
@@ -257,6 +262,7 @@ class ProtoBrowser extends Component {
               </Card>
             </div>
           </div>
+          <br></br>
         </div>
       </div>
     );
