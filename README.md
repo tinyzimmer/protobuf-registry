@@ -30,7 +30,7 @@ $> pip install --index-url http://localhost:8080/pip my-app-protocol
 $> pip install --index-url http://localhost:8080/pip my-app-protocol==0.0.1
 ```
 
-This should be possible for _most_ interpreted languages when (ruby marshaling in golang is a bitch). I'm sure I can do it with `go get` also. However, at time of writing, only pip has it.
+This should be possible for _most_ interpreted languages (ruby marshaling in golang is a bitch). I'm sure I can do it with `go get` also. However, at time of writing, only pip has it.
 
 This project was primarily just me being bored and wanting to build something, but also was an opportunity for me to finally start learning some modern front-end technologies while making the UI. However, if I decide to keep building on it, I eventually want to incorporate elements from [`prototool`](https://github.com/uber/prototool) as well. Since it's also in go it would be easy to include some of their functionality (e.g. linting).
 
