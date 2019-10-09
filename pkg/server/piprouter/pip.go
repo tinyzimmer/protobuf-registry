@@ -29,6 +29,6 @@ type pipServer struct {
 func RegisterRoutes(router *mux.Router, path string, ctrl *common.ServerController) {
 	pip := &pipServer{ctrl}
 	pipRouter := router.PathPrefix(path).Subrouter()
-	pipRouter.HandleFunc("/{name}", pip.getPipVersionsHandler).Methods("GET")
+	pipRouter.HandleFunc("/{name}/", pip.getPipVersionsHandler).Methods("GET")
 	pipRouter.HandleFunc("/download/{name}", pip.getPipDownloadHandler).Methods("GET")
 }
