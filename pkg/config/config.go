@@ -69,6 +69,7 @@ type Config struct {
 	ProtobufVersion string `ignored:"true" json:"protobuf_version"`
 
 	GoVersion   string `ignored:"true" json:"go_version"`
+	GitCommit   string `ignored:"true" json:"git_commit"`
 	CompileDate string `ignored:"true" json:"compile_date"`
 }
 

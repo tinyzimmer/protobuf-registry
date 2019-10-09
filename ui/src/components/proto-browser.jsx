@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { Classes, Tree, Card, Breadcrumbs, Icon, Divider } from "@blueprintjs/core";
+import { Classes, Tree, Card, Breadcrumbs, Icon, Divider, Spinner } from "@blueprintjs/core";
 
 const Header = () => {
   return (
@@ -79,6 +79,7 @@ class ProtoBrowser extends Component {
       fileText: "",
       fileTextHeader: "",
       breadcrumbs: [],
+      loading: true,
     }
     this.handleFileClick = this.handleFileClick.bind(this)
     this.handleDirExpand = this.handleDirExpand.bind(this)
@@ -210,6 +211,7 @@ class ProtoBrowser extends Component {
         return ''
       });
       nodes.sort((a, b) => (a.label > b.label) ? 1 : -1)
+      this.setState({loading: false})
       this.setState({nodes: nodes})
     })
   }
@@ -220,30 +222,40 @@ class ProtoBrowser extends Component {
 
   render() {
     return (
-      <div align="left" style={{paddingLeft: '5em', paddingRight: '5em'}}>
+      <div align="center">
         <Header />
-        <br></br>
-        <div className="wrapper">
-          <div style={{width: '35%'}}>
-            <Card elevation="3" className="bp3-dark">
-            <Tree
-              contents={this.state.nodes}
-              onNodeClick={this.handleNodeClick}
-              onNodeCollapse={this.handleNodeCollapse}
-              onNodeExpand={this.handleNodeExpand}
-              className={Classes.TREE}
-            />
-            </Card>
-          </div>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <div hidden={this.state.fileViewHidden} style={{width: '65%'}}>
-            <Card elevation="3" className="bp3-dark" style={{width: '100%'}}>
-              <Breadcrumbs currentBreadcumbRenderer={this.renderCurrentBreadcrumb} items={this.state.breadcrumbs} />
-              <br></br>
-              <SyntaxHighlighter language="protobuf" style={atomOneDark}>
-                {this.state.fileText}
-              </SyntaxHighlighter>
-            </Card>
+        <div align="center" hidden={!this.state.loading}>
+          <Spinner size={Spinner.SIZE_LARGE}></Spinner>
+        </div>
+        <div align="left" style={{paddingLeft: '5em', paddingRight: '5em'}}>
+          <br></br>
+          <div className="wrapper">
+            <div hidden={this.state.nodes.length === 0 || this.state.loading} style={{width: '35%'}}>
+              <Card elevation="3" className="bp3-dark">
+              <Tree
+                contents={this.state.nodes}
+                onNodeClick={this.handleNodeClick}
+                onNodeCollapse={this.handleNodeCollapse}
+                onNodeExpand={this.handleNodeExpand}
+                className={Classes.TREE}
+              />
+              </Card>
+            </div>
+            <div hidden={this.state.nodes.length !== 0 || this.state.loading}>
+              <Card elevation="3" className="bp3-dark">
+                The registry is empty
+              </Card>
+            </div>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <div hidden={this.state.fileViewHidden} style={{width: '65%'}}>
+              <Card elevation="3" className="bp3-dark" style={{width: '100%'}}>
+                <Breadcrumbs currentBreadcumbRenderer={this.renderCurrentBreadcrumb} items={this.state.breadcrumbs} />
+                <br></br>
+                <SyntaxHighlighter language="protobuf" style={atomOneDark}>
+                  {this.state.fileText}
+                </SyntaxHighlighter>
+              </Card>
+            </div>
           </div>
         </div>
       </div>

@@ -30,6 +30,7 @@ import (
 )
 
 var CompileDate string
+var GitCommit string
 
 var log = glogr.New()
 var catchSignals = []os.Signal{syscall.SIGINT, syscall.SIGTERM}
@@ -47,6 +48,7 @@ func main() {
 	setupLog.Info(string(config.GlobalConfig.JSON()))
 
 	config.GlobalConfig.CompileDate = CompileDate
+	config.GlobalConfig.GitCommit = GitCommit
 
 	// start the webserver
 	setupLog.Info("Starting proto-registry server")

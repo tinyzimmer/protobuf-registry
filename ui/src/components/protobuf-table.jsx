@@ -4,7 +4,7 @@ import { PaginationOptions, TableColumns } from './table-options.jsx';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import { Tag, Card, Divider } from "@blueprintjs/core";
+import { Tag, Card, Divider, Spinner } from "@blueprintjs/core";
 
 import ProtobufMenu from './protobuf-menu.jsx';
 import DeleteButton from './version-delete.jsx';
@@ -24,7 +24,7 @@ const nameTag = (parent, data) => {
 class ProtobufTable extends Component {
   constructor(props) {
     super(props)
-    this.state = {data: []}
+    this.state = {data: [], loading: true}
     this.deleteCallback = this.deleteCallback.bind(this)
   }
 
@@ -56,6 +56,7 @@ class ProtobufTable extends Component {
         return ''
       });
       this.setState({data: newRows})
+      this.setState({loading: false})
       console.log(this.state);
     })
   }
@@ -79,6 +80,9 @@ class ProtobufTable extends Component {
                 <SearchBar { ...props.searchProps } />
               </div>
             </Card>
+            <div align="center" hidden={!this.state.loading}>
+              <Spinner size={Spinner.SIZE_LARGE}></Spinner>
+            </div>
             <Divider></Divider>
             <BootstrapTable
               { ...props.baseProps }

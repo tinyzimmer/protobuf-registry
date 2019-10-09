@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Card, Elevation, Pre, Collapse, Divider } from "@blueprintjs/core";
+import { Button, Card, Elevation, Pre, Collapse, Divider, Spinner } from "@blueprintjs/core";
 
 const Header = () => {
   return (
@@ -55,6 +55,7 @@ class APIDoc extends Component {
     super(props);
     this.state = {
       routes: [],
+      loading: true,
     };
   }
 
@@ -64,22 +65,28 @@ class APIDoc extends Component {
       return result.json();
     }).then(data => {
       this.setState({routes: data.routes})
+      this.setState({loading: false})
       console.log(this.state)
     })
   }
 
   render() {
     return (
-      <div align="left" style={{paddingLeft: '10em', paddingRight: '10em'}}>
+      <div align="center">
         <Header />
-        {this.state.routes.map((route, index) => {
-          return (
-            <div>
-              <DocCollapse key={index} data={route} />
-              <br></br>
-            </div>
-          );
-        })}
+        <div align="center" hidden={!this.state.loading}>
+          <Spinner size={Spinner.SIZE_LARGE}></Spinner>
+        </div>
+        <div align="left" style={{paddingLeft: '10em', paddingRight: '10em'}}>
+          {this.state.routes.map((route, index) => {
+            return (
+              <div>
+                <DocCollapse key={index} data={route} />
+                <br></br>
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   }
