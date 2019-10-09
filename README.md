@@ -11,7 +11,7 @@ A repository, package manager, and file viewer for Protocol Buffers.
 
 This project is a repository for protocol buffer packages.
 Groups of `.proto` files can be kept in the registry and versioned appropriately.
-You can then query the registry for details on your packages as well as to retrieve the generated code or descriptor sets with simple API calls.
+You can then retrieve details on your packages as well as generated code and descriptor sets with simple API calls.
 There is also a Web UI available for visualizing your packages and other ad-hoc operations.
 
 Where feasible, I want to support package manager discovery for various languages.
