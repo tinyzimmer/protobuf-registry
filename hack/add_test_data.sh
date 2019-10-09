@@ -30,13 +30,18 @@ post-test-data() {
   for msg in "${messagenames[@]}" ; do
     curl \
       -X POST localhost:8080/api/proto \
-      --data "{\"version\": \"$(random-version)\", \"name\": \"$msg-proto\", \"body\": \"${b64data}\"}"
-    curl \
-      -X POST localhost:8080/api/proto \
-      --data "{\"version\": \"$(random-version)\", \"name\": \"$msg-proto\", \"body\": \"${b64data}\"}"
-    curl \
-      -X POST localhost:8080/api/proto \
-      --data "{\"version\": \"$(random-version)\", \"name\": \"$msg-proto\", \"body\": \"${b64data}\"}"
+      --data "
+        {
+          \"version\": \"$(random-version)\",
+          \"name\": \"$msg-proto\",
+          \"body\": \"${b64data}\",
+          \"remoteDeps\": [
+            {
+              \"url\": \"github.com/googleapis/googleapis/google/api\",
+              \"revision\": \"common-protos-1_3_1\"
+            }
+          ]
+        }"
   done
 }
 

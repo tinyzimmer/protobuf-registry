@@ -25,14 +25,14 @@ import (
 
 	"github.com/go-logr/glogr"
 	"github.com/gorilla/mux"
-	"github.com/tinyzimmer/proto-registry/pkg/config"
-	"github.com/tinyzimmer/proto-registry/pkg/database"
-	"github.com/tinyzimmer/proto-registry/pkg/server/apirouter"
-	"github.com/tinyzimmer/proto-registry/pkg/server/common"
-	"github.com/tinyzimmer/proto-registry/pkg/server/gemrouter"
-	"github.com/tinyzimmer/proto-registry/pkg/server/mvnrouter"
-	"github.com/tinyzimmer/proto-registry/pkg/server/piprouter"
-	"github.com/tinyzimmer/proto-registry/pkg/storage"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/database"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/apirouter"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/gemrouter"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/mvnrouter"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/piprouter"
+	"github.com/tinyzimmer/protobuf-registry/pkg/storage"
 )
 
 var log = glogr.New()

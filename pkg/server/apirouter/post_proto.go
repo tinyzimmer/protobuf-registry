@@ -19,37 +19,13 @@ package apirouter
 
 import (
 	"errors"
-	"io"
 	"net/http"
 
-	"github.com/tinyzimmer/proto-registry/pkg/config"
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
-	"github.com/tinyzimmer/proto-registry/pkg/server/common"
-	"github.com/tinyzimmer/proto-registry/pkg/util"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 )
-
-func validatePost(req *PostProtoRequest) (*PostProtoRequest, error) {
-	if req.Name == nil || req.Body == nil {
-		return req, errors.New("'name' and 'body' are required")
-	} else if req.Version == nil {
-		req.Version = util.StringPtr("0.0.1")
-	}
-	return req, nil
-}
-
-type PostProtoRequest struct {
-	ID      *string `json:"id,omitempty"`
-	Name    *string `json:"name,omitempty"`
-	Body    *string `json:"body,omitempty"`
-	Version *string `json:"version,omitempty"`
-}
-
-func unmarshalProtoRequest(rdr io.ReadCloser) (*PostProtoRequest, error) {
-	defer rdr.Close()
-	var req PostProtoRequest
-	err := common.UnmarshallInto(rdr, &req)
-	return &req, err
-}
 
 func (api *apiServer) postProtoHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
@@ -63,30 +39,30 @@ func (api *apiServer) postProtoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req *PostProtoRequest
+	var req *types.PostProtoRequest
 	var err error
 
 	// unmarshall the request
-	if req, err = unmarshalProtoRequest(r.Body); err != nil {
+	if req, err = types.NewProtoReqFromReader(r.Body); err != nil {
 		common.BadRequest(err, w)
 		return
 	}
 
 	// validate parameters
-	if req, err = validatePost(req); err != nil {
+	if err = req.Validate(); err != nil {
 		common.BadRequest(err, w)
 		return
 	}
 
 	// Create a protobuf object from the request
-	proto := protobuf.New(req.ID, req.Name, req.Version)
+	proto := protobuf.NewFromRequest(req)
 	if err := proto.SetRawFromBase64(req.Body); err != nil {
 		common.BadRequest(err, w)
 		return
 	}
 
-	// make sure it compiles
-	if _, err := proto.CompileDescriptorSet(); err != nil {
+	// compile and set the descirptor set
+	if err := proto.CompileDescriptorSet(); err != nil {
 		common.BadRequest(err, w)
 		return
 	}

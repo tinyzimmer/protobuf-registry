@@ -21,9 +21,11 @@ import (
 	"archive/zip"
 	"bytes"
 	"errors"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 
-	"github.com/tinyzimmer/proto-registry/pkg/util"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
 func (p *Protobuf) rawZipFiles() ([]*zip.File, error) {
@@ -38,18 +40,23 @@ func (p *Protobuf) rawZipFiles() ([]*zip.File, error) {
 	return reader.File, nil
 }
 
-func (p *Protobuf) newTempFilesFromRaw() (path string, filesInfo map[string][]os.FileInfo, rm func(), err error) {
+func (p *Protobuf) newTempFilesFromRaw(withDescriptor bool) (rootPath, descriptorPath string, filesInfo map[string][]os.FileInfo, err error) {
+	if withDescriptor {
+		if p.DescriptorBytes() == nil {
+			err = errors.New("raw descriptor set is nil, need to call p.SetDescriptor() or load from storage")
+			return
+		}
+	}
 	var files []*zip.File
 	if files, err = p.rawZipFiles(); err != nil {
 		return
 	}
-	if path, filesInfo, err = util.WriteZipFilesToTempDir(files); err != nil {
+	if rootPath, filesInfo, err = util.WriteZipFilesToTempDir(files); err != nil {
 		return
 	}
-	rm = func() {
-		if err := os.RemoveAll(path); err != nil {
-			log.Error(err, "Failed to remove tempdir")
-		}
+	if withDescriptor {
+		descriptorPath = filepath.Join(rootPath, "descriptor.pb")
+		err = ioutil.WriteFile(descriptorPath, p.DescriptorBytes(), 0600)
 	}
 	return
 }

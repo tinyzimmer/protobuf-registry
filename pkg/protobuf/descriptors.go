@@ -18,9 +18,11 @@
 package protobuf
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
 )
@@ -50,6 +52,7 @@ func (p *Protobuf) Descriptors() (*ProtobufDescriptors, error) {
 	if err != nil {
 		return nil, err
 	}
+	//defer os.RemoveAll(tempPath)
 	out := &ProtobufDescriptors{
 		Messages:     make([]*ProtobufMessage, 0),
 		SourceFiles:  make([]string, 0),
@@ -69,19 +72,29 @@ func (p *Protobuf) Descriptors() (*ProtobufDescriptors, error) {
 // GetDescriptors returns the raw file descriptors for a protobuf object
 // This is primarily a helper for functions that return more human readable
 // formats
-func (p *Protobuf) GetDescriptors() ([]*desc.FileDescriptor, error) {
-	// return if cached
-	if p.descriptors != nil {
-		return p.descriptors, nil
-	}
-	// write raw proto to temp files
-	tempPath, tempFiles, remove, err := p.newTempFilesFromRaw()
-	if err != nil {
+func (p *Protobuf) GetDescriptors() (map[string]*desc.FileDescriptor, error) {
+	// // write raw proto to temp files
+	// tempPath, _, tempFiles, err := p.newTempFilesFromRaw(false)
+	// if err != nil {
+	// 	return "", nil, err
+	// }
+	//
+	// descriptors, err := getDescriptorsFromZipFiles(tempPath, tempFiles)
+	// return tempPath, descriptors, err
+	descriptorSet := new(descriptor.FileDescriptorSet)
+	if err := descriptorSet.XXX_Unmarshal(p.DescriptorBytes()); err != nil {
 		return nil, err
 	}
-	defer remove()
+	return desc.CreateFileDescriptorsFromSet(descriptorSet)
+}
+
+func getDescriptorsFromZipFiles(tempPath string, tempFiles map[string][]os.FileInfo) ([]*desc.FileDescriptor, error) {
 	// create a protoparser
-	parser := protoparse.Parser{ImportPaths: []string{tempPath}, InferImportPaths: true}
+	parser := protoparse.Parser{
+		ImportPaths:           []string{tempPath},
+		InferImportPaths:      true,
+		IncludeSourceCodeInfo: true,
+	}
 	files := make([]string, 0)
 	// protoparse wants only the basename of the file when using ImportPaths
 	for dir, fileInfo := range tempFiles {
@@ -113,11 +126,5 @@ func (p *Protobuf) GetDescriptors() ([]*desc.FileDescriptor, error) {
 		}
 		descriptors = append(descriptors, descr...)
 	}
-	// descriptors, err = parser.ParseFiles(files...)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// set response to cache
-	p.descriptors = descriptors
-	return descriptors, err
+	return descriptors, nil
 }

@@ -22,10 +22,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/tinyzimmer/proto-registry/pkg/config"
-	dbcommon "github.com/tinyzimmer/proto-registry/pkg/database/common"
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
-	"github.com/tinyzimmer/proto-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	dbcommon "github.com/tinyzimmer/protobuf-registry/pkg/database/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
 )
 
 func (api *apiServer) deleteAllProtoVersionsHandler(w http.ResponseWriter, r *http.Request) {

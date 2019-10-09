@@ -61,6 +61,9 @@ type Config struct {
 	// Memory database settings
 	PersistMemoryToDisk bool `envconfig:"persist_memory" default:"false" json:"persist_memory"`
 
+	// Pre-populate cache with remote dependencies
+	PreCachedRemotes []string `envconfig:"pre_cached_remotes" json:"pre_cached_remotes"`
+
 	// UI Settings
 	RedirectNotFoundToUI bool `envconfig:"ui_redirect_all" default:"true" json:"ui_redirect_all"`
 	CORSEnabled          bool `envconfig:"enable_cors" default:"false" json:"cors_enabled"`
@@ -68,6 +71,7 @@ type Config struct {
 	// protobuf version as detected at boot
 	ProtobufVersion string `ignored:"true" json:"protobuf_version"`
 
+	// Compile environment
 	GoVersion   string `ignored:"true" json:"go_version"`
 	GitCommit   string `ignored:"true" json:"git_commit"`
 	CompileDate string `ignored:"true" json:"compile_date"`

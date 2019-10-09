@@ -28,10 +28,10 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/tinyzimmer/proto-registry/pkg/config"
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
-	"github.com/tinyzimmer/proto-registry/pkg/server/common"
-	"github.com/tinyzimmer/proto-registry/pkg/util"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
 type mavenServer struct {

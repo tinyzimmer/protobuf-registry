@@ -22,7 +22,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/tinyzimmer/proto-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 )
 
 type CatchAllHandler struct {

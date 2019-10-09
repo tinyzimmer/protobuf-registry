@@ -23,7 +23,7 @@ import (
 	"compress/zlib"
 
 	"github.com/samcday/rmarsh"
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
 )
 
 func NewRubyGemsListFromPackages(in []*protobuf.Protobuf) (out []byte, err error) {

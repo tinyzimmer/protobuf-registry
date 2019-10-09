@@ -24,20 +24,41 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
-	"github.com/tinyzimmer/proto-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/remotecache"
 )
 
-func (p *Protobuf) CompileDescriptorSet() ([]byte, error) {
-	tempPath, tempFiles, remove, err := p.newTempFilesFromRaw()
-	if err != nil {
-		return nil, err
+func (p *Protobuf) CompileDescriptorSet() error {
+	var deps []*remotecache.GitDependency
+	if len(p.Dependencies) > 0 {
+		for _, remoteDep := range p.Dependencies {
+			dep, err := remotecache.Cache().GetGitDependency(remoteDep)
+			if err != nil {
+				return err
+			}
+			deps = append(deps, dep)
+		}
 	}
-	defer remove()
+	tempPath, _, tempFiles, err := p.newTempFilesFromRaw(false)
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tempPath)
+
+	if len(deps) > 0 {
+		for _, x := range deps {
+			if err := x.InjectToPath(tempPath); err != nil {
+				return err
+			}
+		}
+	}
+
 	tempOut, err := ioutil.TempDir("", "")
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer os.RemoveAll(tempOut)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.GlobalConfig.CompileTimeout)*time.Second)
@@ -45,17 +66,19 @@ func (p *Protobuf) CompileDescriptorSet() ([]byte, error) {
 	args := []string{
 		fmt.Sprintf("-I=%s", tempPath),
 		"--include_imports",
+		"--include_source_info",
 		fmt.Sprintf("--descriptor_set_out=%s", filepath.Join(tempOut, "descriptor.pb")),
 	}
-	args = append(args, tempFilesToStrings(tempFiles)...)
+	args = append(args, tempFilesToStrings(tempFiles, "")...)
 	out, err := exec.CommandContext(ctx,
 		config.GlobalConfig.ProtocPath,
 		args...,
 	).CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf("failed to compile protocol spec: %s", string(out))
+		return fmt.Errorf("failed to compile protocol spec: %s", string(out))
 	}
-	return ioutil.ReadFile(filepath.Join(tempOut, "descriptor.pb"))
+	p.descriptor, err = ioutil.ReadFile(filepath.Join(tempOut, "descriptor.pb"))
+	return err
 }
 
 type CompileTarget int
@@ -99,11 +122,11 @@ func getTargetArg(target CompileTarget) string {
 }
 
 func (p Protobuf) CompileTo(target CompileTarget, prefix string) (tempOut string, rm func(), err error) {
-	rawPath, tempFiles, remove, err := p.newTempFilesFromRaw()
+	rawPath, descriptorSet, tempFiles, err := p.newTempFilesFromRaw(true)
 	if err != nil {
 		return "", nil, err
 	}
-	defer remove()
+	defer os.RemoveAll(rawPath)
 
 	tempOut, err = ioutil.TempDir("", "")
 	if err != nil {
@@ -129,10 +152,11 @@ func (p Protobuf) CompileTo(target CompileTarget, prefix string) (tempOut string
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.GlobalConfig.CompileTimeout)*time.Second)
 	defer cancel()
 	args := []string{
-		fmt.Sprintf("-I=%s", rawPath),
+		//fmt.Sprintf("-I=%s", rawPath),
+		fmt.Sprintf("--descriptor_set_in=%s", descriptorSet),
 		fmt.Sprintf("%s=%s", getTargetArg(target), out),
 	}
-	args = append(args, tempFilesToStrings(tempFiles)...)
+	args = append(args, tempFilesToStrings(tempFiles, rawPath+"/")...)
 
 	cmdout, err := exec.CommandContext(ctx,
 		config.GlobalConfig.ProtocPath,
@@ -145,12 +169,16 @@ func (p Protobuf) CompileTo(target CompileTarget, prefix string) (tempOut string
 	return tempOut, rm, nil
 }
 
-func tempFilesToStrings(in map[string][]os.FileInfo) []string {
+func tempFilesToStrings(in map[string][]os.FileInfo, trimPrefix string) []string {
 	out := make([]string, 0)
 	for dir, files := range in {
 		for _, file := range files {
 			if !file.IsDir() {
-				out = append(out, filepath.Join(dir, file.Name()))
+				fpath := filepath.Join(dir, file.Name())
+				if trimPrefix != "" {
+					fpath = strings.TrimPrefix(fpath, trimPrefix)
+				}
+				out = append(out, fpath)
 			}
 		}
 	}

@@ -20,9 +20,9 @@ package apirouter
 import (
 	"net/http"
 
-	dbcommon "github.com/tinyzimmer/proto-registry/pkg/database/common"
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
-	"github.com/tinyzimmer/proto-registry/pkg/server/common"
+	dbcommon "github.com/tinyzimmer/protobuf-registry/pkg/database/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
 )
 
 func (api *apiServer) getAllProtoHandler(w http.ResponseWriter, r *http.Request) {

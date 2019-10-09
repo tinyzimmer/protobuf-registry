@@ -24,9 +24,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
-	"github.com/tinyzimmer/proto-registry/pkg/server/common"
-	"github.com/tinyzimmer/proto-registry/pkg/util"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
 func getLanguage(r *http.Request) string {
@@ -58,12 +58,7 @@ func (api *apiServer) downloadProtoHandler(w http.ResponseWriter, r *http.Reques
 		common.ServeFile(w, r, proto.RawFilename(), proto.RawReader())
 		return
 	} else if language == "descriptors" {
-		out, err := proto.CompileDescriptorSet()
-		if err != nil {
-			common.BadRequest(err, w)
-			return
-		}
-		common.ServeFile(w, r, fmt.Sprintf("%s-%s-descriptors.pb", *proto.Name, *proto.Version), bytes.NewReader(out))
+		common.ServeFile(w, r, fmt.Sprintf("%s-%s-descriptors.pb", *proto.Name, *proto.Version), proto.DescriptorReader())
 		return
 	}
 

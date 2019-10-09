@@ -22,7 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
 )
 
 var setupPyTemplateString = `

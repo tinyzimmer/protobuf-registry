@@ -31,6 +31,10 @@ func (f *fileProvider) rawFilePath() string {
 	return filepath.Join(f.root(), "raw")
 }
 
+func (f *fileProvider) protoRoot() string {
+	return filepath.Join(f.root(), "proto")
+}
+
 func (f *fileProvider) mkdirAll(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		if err := os.MkdirAll(path, 0700); err != nil {

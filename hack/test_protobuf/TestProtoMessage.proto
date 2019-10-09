@@ -1,3 +1,10 @@
+/**
+ * Testing documentation strings
+ *
+ * This file is really just an example. The data model is completely
+ * fictional.
+ */
+
 syntax = "proto3";
 
 option java_package = "com.example.test.data";
@@ -9,7 +16,7 @@ import "details/TestProtoMessageDetails.proto";
  * This is a leading test doc
 */
 message TestProtoMessage {
-    int32 messageId = 1; // some message id
-    int64 messageTime = 2; // some message time
-    TestProtoMessageDetails details = 3; // details about the message
+    int32 messageId = 1; /// some message id
+    int64 messageTime = 2; /// some message time
+    TestProtoMessageDetails details = 3; /// details about the message
 }

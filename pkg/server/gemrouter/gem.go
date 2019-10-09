@@ -22,9 +22,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
-	"github.com/tinyzimmer/proto-registry/pkg/server/common"
-	"github.com/tinyzimmer/proto-registry/pkg/util/rubyutil"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util/rubyutil"
 )
 
 type gemServer struct {

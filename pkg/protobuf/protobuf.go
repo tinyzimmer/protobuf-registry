@@ -27,32 +27,36 @@ import (
 	"time"
 
 	"github.com/go-logr/glogr"
-	"github.com/jhump/protoreflect/desc"
+	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 )
 
 var log = glogr.New()
 
 type Protobuf struct {
-	ID          *string   `json:"id"`
-	Name        *string   `json:"name"`
-	Version     *string   `json:"version"`
-	LastUpdated time.Time `json:"lastUpdated"`
-	raw         []byte
-	descriptors []*desc.FileDescriptor
+	ID           *string                  `json:"id"`
+	Name         *string                  `json:"name"`
+	Version      *string                  `json:"version"`
+	LastUpdated  time.Time                `json:"lastUpdated"`
+	Dependencies []*types.ProtoDependency `json:"dependencies"`
+	// raw zip bytes
+	raw []byte
+	// raw descriptor bytes
+	descriptor []byte
 }
 
-func New(id, name, version *string) *Protobuf {
+func NewFromRequest(req *types.PostProtoRequest) *Protobuf {
 	return &Protobuf{
-		ID:      id,
-		Name:    name,
-		Version: version,
+		ID:           &req.ID,
+		Name:         &req.Name,
+		Version:      &req.Version,
+		Dependencies: req.RemoteDepends,
 	}
 }
 
-func (p *Protobuf) SetRawFromBase64(body *string) error {
+func (p *Protobuf) SetRawFromBase64(body string) error {
 	var raw []byte
 	var err error
-	if raw, err = base64.StdEncoding.DecodeString(*body); err != nil {
+	if raw, err = base64.StdEncoding.DecodeString(body); err != nil {
 		return fmt.Errorf("Could not decode base64: %s", err.Error())
 	}
 	p.SetRaw(raw)
@@ -63,8 +67,16 @@ func (p *Protobuf) SetRaw(raw []byte) {
 	p.raw = raw
 }
 
+func (p *Protobuf) SetDescriptor(raw []byte) {
+	p.descriptor = raw
+}
+
 func (p *Protobuf) Raw() []byte {
 	return p.raw
+}
+
+func (p *Protobuf) DescriptorBytes() []byte {
+	return p.descriptor
 }
 
 func (p *Protobuf) RawFilename() string {
@@ -73,6 +85,10 @@ func (p *Protobuf) RawFilename() string {
 
 func (p *Protobuf) RawReader() io.ReadSeeker {
 	return bytes.NewReader(p.raw)
+}
+
+func (p *Protobuf) DescriptorReader() io.ReadSeeker {
+	return bytes.NewReader(p.descriptor)
 }
 
 func (p *Protobuf) SHA256() (string, error) {

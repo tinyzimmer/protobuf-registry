@@ -18,8 +18,8 @@
 package apirouter
 
 import (
-	db "github.com/tinyzimmer/proto-registry/pkg/database/common"
-	storage "github.com/tinyzimmer/proto-registry/pkg/storage/common"
+	db "github.com/tinyzimmer/protobuf-registry/pkg/database/common"
+	storage "github.com/tinyzimmer/protobuf-registry/pkg/storage/common"
 )
 
 func (api *apiServer) DB() db.DBEngine {

@@ -22,7 +22,7 @@ import (
 	"sort"
 
 	version "github.com/hashicorp/go-version"
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
 )
 
 func GetVersionFromProtoSlice(protos []*protobuf.Protobuf, version string) (*protobuf.Protobuf, error) {

@@ -18,9 +18,9 @@
 package database
 
 import (
-	"github.com/tinyzimmer/proto-registry/pkg/config"
-	"github.com/tinyzimmer/proto-registry/pkg/database/common"
-	"github.com/tinyzimmer/proto-registry/pkg/database/memory"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/database/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/database/memory"
 )
 
 const (

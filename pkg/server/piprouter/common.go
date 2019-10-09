@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"html/template"
 
-	dbcommon "github.com/tinyzimmer/proto-registry/pkg/database/common"
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
-	storagecommon "github.com/tinyzimmer/proto-registry/pkg/storage/common"
+	dbcommon "github.com/tinyzimmer/protobuf-registry/pkg/database/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	storagecommon "github.com/tinyzimmer/protobuf-registry/pkg/storage/common"
 )
 
 var funcMap = template.FuncMap{

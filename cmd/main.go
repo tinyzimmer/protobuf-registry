@@ -25,8 +25,9 @@ import (
 	"syscall"
 
 	"github.com/go-logr/glogr"
-	"github.com/tinyzimmer/proto-registry/pkg/config"
-	"github.com/tinyzimmer/proto-registry/pkg/server"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/remotecache"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server"
 )
 
 var CompileDate string
@@ -65,6 +66,12 @@ func main() {
 			os.Exit(1)
 		}
 	}()
+
+	// initialize the cache
+	if err := remotecache.InitCache(); err != nil {
+		setupLog.Error(err, "Failed to initialize remote dependency cache")
+		os.Exit(1)
+	}
 
 	// make a signal channel
 	c := make(chan os.Signal, 1)

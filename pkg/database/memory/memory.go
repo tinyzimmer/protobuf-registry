@@ -23,12 +23,12 @@ import (
 	"time"
 
 	"github.com/go-logr/glogr"
-	"github.com/tinyzimmer/proto-registry/pkg/config"
-	dbcommon "github.com/tinyzimmer/proto-registry/pkg/database/common"
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
-	"github.com/tinyzimmer/proto-registry/pkg/storage"
-	storagecommon "github.com/tinyzimmer/proto-registry/pkg/storage/common"
-	"github.com/tinyzimmer/proto-registry/pkg/util"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	dbcommon "github.com/tinyzimmer/protobuf-registry/pkg/database/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/storage"
+	storagecommon "github.com/tinyzimmer/protobuf-registry/pkg/storage/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
 var log = glogr.New()
@@ -110,7 +110,7 @@ func (m *memoryDatabase) GetProtoVersions(name string) ([]*protobuf.Protobuf, er
 func (m *memoryDatabase) StoreProtoVersion(proto *protobuf.Protobuf) (*protobuf.Protobuf, error) {
 	m.mux.Lock()
 	defer m.mux.Unlock()
-	if proto.ID == nil {
+	if proto.ID == nil || *proto.ID == "" {
 		proto.ID = util.StringPtr(util.RandomString(32))
 	}
 	if existing, ok := m.protoBufs[*proto.Name]; ok {

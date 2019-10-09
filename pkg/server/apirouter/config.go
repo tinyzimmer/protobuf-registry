@@ -20,8 +20,8 @@ package apirouter
 import (
 	"net/http"
 
-	"github.com/tinyzimmer/proto-registry/pkg/config"
-	"github.com/tinyzimmer/proto-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
 )
 
 func (api *apiServer) getConfigHandler(w http.ResponseWriter, r *http.Request) {

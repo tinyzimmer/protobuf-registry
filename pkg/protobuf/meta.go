@@ -22,14 +22,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	docreq "github.com/golang/protobuf/protoc-gen-go/plugin"
 	"github.com/jhump/protoreflect/desc"
-	docgen "github.com/pseudomuto/protoc-gen-doc"
-	"github.com/tinyzimmer/proto-registry/pkg/config"
 )
 
 func appendPkgsFromDescriptor(p *ProtobufDescriptors, f *desc.FileDescriptor) (o *ProtobufDescriptors) {
@@ -70,65 +65,13 @@ func parseMessageFields(fields []*desc.FieldDescriptor) map[string]string {
 	return fieldData
 }
 
-func intPtr(s string) *int32 {
-	i, _ := strconv.Atoi(s)
-	i32 := int32(i)
-	return &i32
-}
-
-func parseProtocVersion() *docreq.Version {
-	spl := strings.Split(config.GlobalConfig.ProtobufVersion, " ")
-	vers := spl[len(spl)-1]
-	versSplit := strings.Split(vers, ".")
-	return &docreq.Version{
-		Major: intPtr(versSplit[0]),
-		Minor: intPtr(versSplit[1]),
-		Patch: intPtr(versSplit[2]),
-	}
-}
-
-func (p *Protobuf) DocJSON(filename string) ([]byte, error) {
-	// write raw proto to temp files
-	descriptors, err := p.GetDescriptors()
-	if err != nil {
-		return nil, err
-	}
-	var desc *desc.FileDescriptor
-	var rawDescriptors []*descriptor.FileDescriptorProto
-	for _, x := range descriptors {
-		rawDescriptors = append(rawDescriptors, x.AsFileDescriptorProto())
-		if x.GetName() == filename || x.GetName() == strings.TrimPrefix(filename, "/") {
-			desc = x
-			break
-		}
-	}
-	if desc == nil {
-		return nil, fmt.Errorf("No file %s in this protobuf package", filename)
-	}
-	plugin := docgen.Plugin{}
-	param := "json,docs.json"
-	res, err := plugin.Generate(&docreq.CodeGeneratorRequest{
-		FileToGenerate:  []string{desc.GetName()},
-		ProtoFile:       rawDescriptors,
-		CompilerVersion: parseProtocVersion(),
-		Parameter:       &param,
-	})
-	if err != nil {
-		return nil, err
-	} else if len(res.File) == 0 {
-		return nil, fmt.Errorf("No documentation returned from the plugin")
-	}
-	content := *res.File[0].Content
-	return []byte(content), nil
-}
-
 func (p *Protobuf) Contents(filename string) ([]byte, error) {
 	// write raw proto to temp files
-	tempPath, filesInfo, remove, err := p.newTempFilesFromRaw()
+	tempPath, _, filesInfo, err := p.newTempFilesFromRaw(false)
 	if err != nil {
 		return nil, err
 	}
-	defer remove()
+	defer os.RemoveAll(tempPath)
 
 	filePath, err := getFilePathFromZipFiles(tempPath, filesInfo, filename)
 	if err != nil {

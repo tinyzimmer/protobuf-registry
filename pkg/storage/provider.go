@@ -18,9 +18,9 @@
 package storage
 
 import (
-	"github.com/tinyzimmer/proto-registry/pkg/config"
-	"github.com/tinyzimmer/proto-registry/pkg/storage/common"
-	"github.com/tinyzimmer/proto-registry/pkg/storage/file"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/storage/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/storage/file"
 )
 
 const (

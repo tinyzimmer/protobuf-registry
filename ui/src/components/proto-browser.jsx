@@ -9,6 +9,9 @@ import {
   Icon,
   Divider,
   Spinner,
+  Tag,
+  Collapse,
+  HTMLTable
 } from "@blueprintjs/core";
 
 const Header = () => {
@@ -83,16 +86,20 @@ class ProtoBrowser extends Component {
     super(props);
     this.state = {
       nodes: [],
-      visibleNodes: [],
-      curStartIdx: 0,
-      curEndIdx: 0,
       fileViewHidden: true,
+      fileTextExpanded: false,
+      docTextExpanded: true,
       fileText: "",
-      docText: "",
+      docContents: {
+        files: [],
+        scalarValueTypes: [],
+      },
       fileTextHeader: "",
       breadcrumbs: [],
       loading: true,
     }
+    this.handleFileContentsClick = this.handleFileContentsClick.bind(this)
+    this.handleDocContentsClick = this.handleDocContentsClick.bind(this)
     this.handleFileClick = this.handleFileClick.bind(this)
     this.handleDirExpand = this.handleDirExpand.bind(this)
     this.handleNodeClick = this.handleNodeClick.bind(this)
@@ -100,6 +107,14 @@ class ProtoBrowser extends Component {
     this.handleNodeExpand = this.handleNodeExpand.bind(this)
     this.handleVersionExpand = this.handleVersionExpand.bind(this)
     this.forEachNode = this.forEachNode.bind(this)
+  }
+
+  handleFileContentsClick() {
+    this.setState({fileTextExpanded: !this.state.fileTextExpanded})
+  }
+
+  handleDocContentsClick() {
+    this.setState({docTextExpanded: !this.state.docTextExpanded})
   }
 
   handleFileClick(nodeData) {
@@ -125,7 +140,6 @@ class ProtoBrowser extends Component {
       crumbs.push({ icon: 'document-open', text: nodeData.label })
       this.setState({breadcrumbs: crumbs})
       this.setState({fileText: fileText})
-      this.setState({fileViewHidden: false})
     })
 
     // fetch file docs
@@ -134,8 +148,13 @@ class ProtoBrowser extends Component {
     .then(results => {
       return results.json()
     }).then(data => {
-      this.setState({docText: JSON.stringify(data, null, 4)})
-      console.log(this.state)
+      this.setState({
+        docContents: {
+          files: data.files,
+          scalarValueTypes: data.scalarValueTypes
+        }
+      })
+      this.setState({fileViewHidden: false})
     })
   }
 
@@ -274,16 +293,32 @@ class ProtoBrowser extends Component {
               <Card elevation="3" className="bp3-dark" style={{width: '100%'}}>
                 <Breadcrumbs currentBreadcumbRenderer={this.renderCurrentBreadcrumb} items={this.state.breadcrumbs} />
                 <br></br>
-                <SyntaxHighlighter language="protobuf" style={atomOneDark}>
-                  {this.state.fileText}
-                </SyntaxHighlighter>
-              </Card>
-              <br></br>
-              <Card elevation="3" className="bp3-dark" style={{width: '100%'}}>
-                <strong>Documentation</strong>
-                <SyntaxHighlighter language="json" style={atomOneDark}>
-                  {this.state.docText}
-                </SyntaxHighlighter>
+                <Tag interactive icon={this.state.fileTextExpanded ? "caret-down" : "caret-right"} onClick={this.handleFileContentsClick}>File Contents</Tag>
+                <Collapse isOpen={this.state.fileTextExpanded}>
+                  <SyntaxHighlighter language="protobuf" style={atomOneDark}>
+                    {this.state.fileText}
+                  </SyntaxHighlighter>
+                </Collapse>
+                <br></br>
+                <br></br>
+                <Tag interactive icon={this.state.docTextExpanded ? "caret-down" : "caret-right"} onClick={this.handleDocContentsClick}>Documentation</Tag>
+                <br></br>
+                <br></br>
+                <Collapse isOpen={this.state.docTextExpanded}>
+                  <div>
+                    {this.state.docContents.files.length && this.state.docContents.files.map((file, index) => {
+                      return (
+                        <div key={index}>
+                          <div align="center">
+                          <h4>{file.name}</h4>
+                          </div>
+                          <i>{file.description}</i>
+                          <strong>{file.package}</strong>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </Collapse>
               </Card>
             </div>
           </div>

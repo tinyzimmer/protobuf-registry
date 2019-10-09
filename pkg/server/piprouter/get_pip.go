@@ -22,9 +22,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
-	"github.com/tinyzimmer/proto-registry/pkg/server/common"
-	"github.com/tinyzimmer/proto-registry/pkg/util"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
 func (pip *pipServer) getPipVersionsHandler(w http.ResponseWriter, r *http.Request) {

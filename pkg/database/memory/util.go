@@ -23,7 +23,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
 )
 
 func (m *memoryDatabase) dumpToDisk() error {

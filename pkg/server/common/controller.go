@@ -18,8 +18,8 @@
 package common
 
 import (
-	dbcommon "github.com/tinyzimmer/proto-registry/pkg/database/common"
-	storagecommon "github.com/tinyzimmer/proto-registry/pkg/storage/common"
+	dbcommon "github.com/tinyzimmer/protobuf-registry/pkg/database/common"
+	storagecommon "github.com/tinyzimmer/protobuf-registry/pkg/storage/common"
 )
 
 type ServerController struct {

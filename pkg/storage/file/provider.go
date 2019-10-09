@@ -22,12 +22,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/tinyzimmer/proto-registry/pkg/config"
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
-	"github.com/tinyzimmer/proto-registry/pkg/storage/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/storage/common"
 )
 
 const zipFileName = "proto.zip"
+const descriptorFileName = "descriptors.pb"
 
 type fileProvider struct {
 	common.Provider
@@ -40,24 +41,29 @@ func NewProvider(conf *config.Config) common.Provider {
 }
 
 func (f *fileProvider) GetRawProto(in *protobuf.Protobuf) (*protobuf.Protobuf, error) {
-	path := filepath.Join(f.root(), *in.ID, zipFileName)
-	var file *os.File
-	var err error
-	if file, err = os.Open(path); err != nil {
-		return in, err
-	}
-	defer file.Close()
-	raw, err := ioutil.ReadAll(file)
+	path := filepath.Join(f.protoRoot(), *in.ID, zipFileName)
+	raw, err := ioutil.ReadFile(path)
 	if err != nil {
 		return in, err
 	}
 	in.SetRaw(raw)
+
+	descriptorPath := filepath.Join(f.protoRoot(), *in.ID, descriptorFileName)
+	dRaw, err := ioutil.ReadFile(descriptorPath)
+	if err != nil {
+		return in, err
+	}
+	in.SetDescriptor(dRaw)
 	return in, nil
 }
 
 func (f *fileProvider) StoreProtoPackage(in *protobuf.Protobuf) error {
-	path := filepath.Join(f.root(), *in.ID, zipFileName)
-	return f.writeRawToDisk(path, in.Raw())
+	path := filepath.Join(f.protoRoot(), *in.ID, zipFileName)
+	if err := f.writeRawToDisk(path, in.Raw()); err != nil {
+		return err
+	}
+	descriptorPath := filepath.Join(f.protoRoot(), *in.ID, descriptorFileName)
+	return f.writeRawToDisk(descriptorPath, in.DescriptorBytes())
 }
 
 func (f *fileProvider) DeleteProtoPackage(in *protobuf.Protobuf) error {

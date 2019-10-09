@@ -19,7 +19,7 @@ package piprouter
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/tinyzimmer/proto-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
 )
 
 type pipServer struct {

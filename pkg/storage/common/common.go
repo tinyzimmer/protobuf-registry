@@ -18,7 +18,7 @@
 package common
 
 import (
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
 )
 
 type Provider interface {

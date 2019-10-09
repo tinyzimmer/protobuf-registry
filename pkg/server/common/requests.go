@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/tinyzimmer/proto-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 )
 
 func GetName(r *http.Request) string {

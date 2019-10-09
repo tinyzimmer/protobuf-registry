@@ -57,6 +57,7 @@ run_persistent: build
 		-v "`pwd`/data:/data" \
 		-e PROTO_REGISTRY_PERSIST_MEMORY=true \
 		-e PROTO_REGISTRY_ENABLE_CORS=true \
+		-e PROTO_REGISTRY_PRE_CACHED_REMOTES="github.com/googleapis/googleapis" \
 		${IMG}
 
 test_data:

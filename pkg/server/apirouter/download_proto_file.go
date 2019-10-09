@@ -22,8 +22,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/tinyzimmer/proto-registry/pkg/protobuf"
-	"github.com/tinyzimmer/proto-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
 )
 
 func getFileVars(r *http.Request, splitStr string) (name, version, filename string) {
