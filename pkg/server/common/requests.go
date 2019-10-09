@@ -59,7 +59,7 @@ func NotFound(err error, w http.ResponseWriter) {
 }
 
 func WriteJSONResponse(res interface{}, w http.ResponseWriter) {
-	out, _ := json.MarshalIndent(res, "", "  ")
+	out, _ := json.MarshalIndent(res, "", "    ")
 	WriteRawResponse(out, w)
 }
 

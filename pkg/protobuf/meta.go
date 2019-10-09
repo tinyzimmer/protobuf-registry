@@ -20,10 +20,16 @@ package protobuf
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	docreq "github.com/golang/protobuf/protoc-gen-go/plugin"
 	"github.com/jhump/protoreflect/desc"
+	docgen "github.com/pseudomuto/protoc-gen-doc"
+	"github.com/tinyzimmer/proto-registry/pkg/config"
 )
 
 func appendPkgsFromDescriptor(p *ProtobufDescriptors, f *desc.FileDescriptor) (o *ProtobufDescriptors) {
@@ -64,6 +70,58 @@ func parseMessageFields(fields []*desc.FieldDescriptor) map[string]string {
 	return fieldData
 }
 
+func intPtr(s string) *int32 {
+	i, _ := strconv.Atoi(s)
+	i32 := int32(i)
+	return &i32
+}
+
+func parseProtocVersion() *docreq.Version {
+	spl := strings.Split(config.GlobalConfig.ProtobufVersion, " ")
+	vers := spl[len(spl)-1]
+	versSplit := strings.Split(vers, ".")
+	return &docreq.Version{
+		Major: intPtr(versSplit[0]),
+		Minor: intPtr(versSplit[1]),
+		Patch: intPtr(versSplit[2]),
+	}
+}
+
+func (p *Protobuf) DocJSON(filename string) ([]byte, error) {
+	// write raw proto to temp files
+	descriptors, err := p.GetDescriptors()
+	if err != nil {
+		return nil, err
+	}
+	var desc *desc.FileDescriptor
+	var rawDescriptors []*descriptor.FileDescriptorProto
+	for _, x := range descriptors {
+		rawDescriptors = append(rawDescriptors, x.AsFileDescriptorProto())
+		if x.GetName() == filename || x.GetName() == strings.TrimPrefix(filename, "/") {
+			desc = x
+			break
+		}
+	}
+	if desc == nil {
+		return nil, fmt.Errorf("No file %s in this protobuf package", filename)
+	}
+	plugin := docgen.Plugin{}
+	param := "json,docs.json"
+	res, err := plugin.Generate(&docreq.CodeGeneratorRequest{
+		FileToGenerate:  []string{desc.GetName()},
+		ProtoFile:       rawDescriptors,
+		CompilerVersion: parseProtocVersion(),
+		Parameter:       &param,
+	})
+	if err != nil {
+		return nil, err
+	} else if len(res.File) == 0 {
+		return nil, fmt.Errorf("No documentation returned from the plugin")
+	}
+	content := *res.File[0].Content
+	return []byte(content), nil
+}
+
 func (p *Protobuf) Contents(filename string) ([]byte, error) {
 	// write raw proto to temp files
 	tempPath, filesInfo, remove, err := p.newTempFilesFromRaw()
@@ -72,20 +130,35 @@ func (p *Protobuf) Contents(filename string) ([]byte, error) {
 	}
 	defer remove()
 
+	filePath, err := getFilePathFromZipFiles(tempPath, filesInfo, filename)
+	if err != nil {
+		return nil, err
+	}
+	return ioutil.ReadFile(filePath)
+}
+
+func getFilePathFromZipFiles(tempPath string, filesInfo map[string][]os.FileInfo, filename string) (string, error) {
+	var file string
+	var err error
 	for dir, files := range filesInfo {
 		rawDir := strings.TrimPrefix(strings.Replace(dir, tempPath, "", 1), "/")
 		for _, x := range files {
 			if len(strings.Split(filename, "/")) == 1 {
 				if x.Name() == filename {
-					return ioutil.ReadFile(filepath.Join(dir, x.Name()))
+					file = filepath.Join(dir, x.Name())
+					break
 				}
 			}
-			if rawDir == filepath.Dir(filename) && x.Name() == filepath.Base(filename) {
-				return ioutil.ReadFile(filepath.Join(dir, x.Name()))
+			if rawDir == strings.TrimPrefix(filepath.Dir(filename), "/") && strings.TrimPrefix(x.Name(), "/") == filepath.Base(filename) {
+				file = filepath.Join(dir, x.Name())
+				break
 			}
 		}
 	}
-	return nil, fmt.Errorf("No file %s in this protobuf package", filename)
+	if file == "" {
+		err = fmt.Errorf("No file %s in this protobuf package", filename)
+	}
+	return file, err
 }
 
 func contains(slice []*string, s *string) bool {

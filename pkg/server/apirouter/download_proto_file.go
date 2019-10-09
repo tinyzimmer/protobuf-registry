@@ -18,6 +18,7 @@
 package apirouter
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -25,17 +26,16 @@ import (
 	"github.com/tinyzimmer/proto-registry/pkg/server/common"
 )
 
-func getFileVars(r *http.Request) (name, version, filename string) {
+func getFileVars(r *http.Request, splitStr string) (name, version, filename string) {
 	name = common.GetName(r)
 	version = common.GetVersion(r)
-	pathSplit := strings.Split(r.URL.Path, "/raw/")
-	filename = pathSplit[len(pathSplit)-1]
+	filename = strings.Replace(r.URL.Path, fmt.Sprintf("api/proto/%s/%s/%s/", name, version, splitStr), "", 1)
 	return name, version, filename
 }
 
 func (api *apiServer) getRawProtoFile(w http.ResponseWriter, r *http.Request) {
 	var err error
-	name, version, filename := getFileVars(r)
+	name, version, filename := getFileVars(r, "raw")
 	var protos []*protobuf.Protobuf
 	if protos, err = api.DB().GetProtoVersions(name); err != nil {
 		common.BadRequest(err, w)
@@ -53,6 +53,33 @@ func (api *apiServer) getRawProtoFile(w http.ResponseWriter, r *http.Request) {
 	out, err := proto.Contents(filename)
 	if err != nil {
 		common.BadRequest(err, w)
+		return
 	}
+	common.WriteRawResponse(out, w)
+}
+
+func (api *apiServer) getMetaForProtoFile(w http.ResponseWriter, r *http.Request) {
+	var err error
+	name, version, filename := getFileVars(r, "meta")
+	var protos []*protobuf.Protobuf
+	if protos, err = api.DB().GetProtoVersions(name); err != nil {
+		common.BadRequest(err, w)
+		return
+	}
+	var proto *protobuf.Protobuf
+	if proto, err = common.GetVersionFromProtoSlice(protos, version); err != nil {
+		common.BadRequest(err, w)
+		return
+	}
+	if proto, err = api.Storage().GetRawProto(proto); err != nil {
+		common.BadRequest(err, w)
+		return
+	}
+	out, err := proto.DocJSON(filename)
+	if err != nil {
+		common.BadRequest(err, w)
+		return
+	}
+
 	common.WriteRawResponse(out, w)
 }

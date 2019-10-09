@@ -81,9 +81,7 @@ This may be adapted to return a list of filenames when a directory is provided.`
 	},
 
 	"/api/proto/{name}/{version}/meta/{filename}": {
-		"GET": `Not implemented yet.
-
-Will retrieve context-specific documentation for a protobuf file in the given package/version.`,
+		"GET": `Retrieves data to construct a table based off the specs within {filename} of package {name} version {version}.`,
 	},
 
 	"/pip/{name}": {

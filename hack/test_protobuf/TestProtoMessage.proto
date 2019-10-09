@@ -5,8 +5,11 @@ option java_outer_classname = "TestDataProtos";
 
 import "details/TestProtoMessageDetails.proto";
 
+/**
+ * This is a leading test doc
+*/
 message TestProtoMessage {
-    int32 messageId = 1;
-    int64 messageTime = 2;
-    TestProtoMessageDetails details = 3;
+    int32 messageId = 1; // some message id
+    int64 messageTime = 2; // some message time
+    TestProtoMessageDetails details = 3; // details about the message
 }

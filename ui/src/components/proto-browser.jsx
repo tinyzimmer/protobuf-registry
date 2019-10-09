@@ -1,7 +1,15 @@
 import React, { Component } from "react";
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { Classes, Tree, Card, Breadcrumbs, Icon, Divider, Spinner } from "@blueprintjs/core";
+import {
+  Classes,
+  Tree,
+  Card,
+  Breadcrumbs,
+  Icon,
+  Divider,
+  Spinner,
+} from "@blueprintjs/core";
 
 const Header = () => {
   return (
@@ -13,8 +21,6 @@ const Header = () => {
     </div>
   )
 }
-
-const NodesPerPage = 15
 
 function enumerateFiles(nodeData, cb) {
   var files = []
@@ -82,6 +88,7 @@ class ProtoBrowser extends Component {
       curEndIdx: 0,
       fileViewHidden: true,
       fileText: "",
+      docText: "",
       fileTextHeader: "",
       breadcrumbs: [],
       loading: true,
@@ -96,8 +103,9 @@ class ProtoBrowser extends Component {
   }
 
   handleFileClick(nodeData) {
-    console.log(nodeData)
     var url = '/api/proto/' + nodeData.parent + '/' + nodeData.version + '/raw' + nodeData.fullPath
+
+    // fetch file text
     fetch(url)
     .then(results => {
       return results.text()
@@ -118,6 +126,16 @@ class ProtoBrowser extends Component {
       this.setState({breadcrumbs: crumbs})
       this.setState({fileText: fileText})
       this.setState({fileViewHidden: false})
+    })
+
+    // fetch file docs
+    url = '/api/proto/' + nodeData.parent + '/' + nodeData.version + '/meta' + nodeData.fullPath
+    fetch(url)
+    .then(results => {
+      return results.json()
+    }).then(data => {
+      this.setState({docText: JSON.stringify(data, null, 4)})
+      console.log(this.state)
     })
   }
 
@@ -258,6 +276,13 @@ class ProtoBrowser extends Component {
                 <br></br>
                 <SyntaxHighlighter language="protobuf" style={atomOneDark}>
                   {this.state.fileText}
+                </SyntaxHighlighter>
+              </Card>
+              <br></br>
+              <Card elevation="3" className="bp3-dark" style={{width: '100%'}}>
+                <strong>Documentation</strong>
+                <SyntaxHighlighter language="json" style={atomOneDark}>
+                  {this.state.docText}
                 </SyntaxHighlighter>
               </Card>
             </div>
