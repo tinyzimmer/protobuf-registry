@@ -76,6 +76,14 @@ class RegistryNavBar extends Component {
             />
           </Link>
         </Navbar.Group>
+        <Navbar.Group align={Alignment.RIGHT}>
+          <a href="https://github.com/tinyzimmer/protobuf-registry" target="_blank">
+          <Button
+            icon="git-branch"
+            text="GitHub"
+          />
+          </a>
+        </Navbar.Group>
       </Navbar>
     )
   }
