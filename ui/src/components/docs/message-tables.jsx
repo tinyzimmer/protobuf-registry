@@ -18,8 +18,8 @@ class MessageTables extends Component {
               </div>
               <br></br>
               <div>
-                <Tag>{msg.fullName}</Tag>&nbsp;&nbsp;
-                <i>{msg.description}</i>
+                <Tag large={true} >{msg.fullName}</Tag>&nbsp;&nbsp;
+                <Pre>{msg.description}</Pre>
               </div>
               <br></br>
               <div align="center">
