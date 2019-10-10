@@ -3,11 +3,9 @@ package remotecache
 import (
 	"fmt"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
@@ -20,6 +18,10 @@ type GitDependency struct {
 	ImportPath   string
 }
 
+func (dep *GitDependency) Dir() string {
+	return filepath.Join(dep.LocalPath, dep.LocalSubPath)
+}
+
 func (dep *GitDependency) InjectToPath(path string) (err error) {
 	localFullPath := filepath.Join(dep.LocalPath, dep.LocalSubPath)
 	if dep.ImportPath == "" {
@@ -28,43 +30,6 @@ func (dep *GitDependency) InjectToPath(path string) (err error) {
 	importFullPath := filepath.Join(path, dep.ImportPath)
 	log.Info(fmt.Sprintf("Injecting %s into import path %s", localFullPath, importFullPath))
 	return util.CopyDir(localFullPath, importFullPath)
-}
-
-func (c *RemoteCache) GetGitDependency(dep *types.ProtoDependency) (gdep *GitDependency, err error) {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-	cloneURL, subPath, err := resolveURL(dep.URL)
-	if err != nil {
-		return
-	}
-	path := filepath.Join(c.cacheRoot, cloneURL.Path)
-	// check if we already have a cached clone
-	if _, err = os.Stat(path); err == nil {
-		gdep = &GitDependency{
-			LocalPath:    path,
-			LocalSubPath: subPath,
-			Revision:     dep.Revision,
-			ImportPath:   dep.Path,
-		}
-		err = gdep.Checkout()
-		return
-	}
-	cloneOpts := &git.CloneOptions{
-		URL: cloneURL.String(),
-	}
-	log.Info(fmt.Sprintf("Cloning %s", cloneOpts.URL))
-	_, err = git.PlainClone(path, false, cloneOpts)
-	if err != nil {
-		return
-	}
-	gdep = &GitDependency{
-		LocalPath:    path,
-		LocalSubPath: subPath,
-		Revision:     dep.Revision,
-		ImportPath:   dep.Path,
-	}
-	err = gdep.Checkout()
-	return
 }
 
 func (dep *GitDependency) Checkout() error {

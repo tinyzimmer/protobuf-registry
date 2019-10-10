@@ -97,6 +97,8 @@ Coming soon
 
 #### TODO
 
+ - [ ] dont use protoc for descriptor sets
+ - [ ] gocode support
  - [ ] unit tests
  - [ ] dev docs
  - [ ] validateOnly/linting on `POST /api/proto`

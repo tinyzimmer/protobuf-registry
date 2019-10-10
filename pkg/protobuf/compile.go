@@ -32,14 +32,14 @@ import (
 )
 
 func (p *Protobuf) CompileDescriptorSet() error {
-	var deps []*remotecache.GitDependency
+	var importPaths []string
 	if len(p.Dependencies) > 0 {
 		for _, remoteDep := range p.Dependencies {
 			dep, err := remotecache.Cache().GetGitDependency(remoteDep)
 			if err != nil {
 				return err
 			}
-			deps = append(deps, dep)
+			importPaths = append(importPaths, dep.Dir())
 		}
 	}
 	tempPath, _, tempFiles, err := p.newTempFilesFromRaw(false)
@@ -47,15 +47,7 @@ func (p *Protobuf) CompileDescriptorSet() error {
 		return err
 	}
 	defer os.RemoveAll(tempPath)
-
-	if len(deps) > 0 {
-		for _, x := range deps {
-			if err := x.InjectToPath(tempPath); err != nil {
-				return err
-			}
-		}
-	}
-
+	importPaths = append(importPaths, tempPath)
 	tempOut, err := ioutil.TempDir("", "")
 	if err != nil {
 		return err
@@ -63,12 +55,16 @@ func (p *Protobuf) CompileDescriptorSet() error {
 	defer os.RemoveAll(tempOut)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.GlobalConfig.CompileTimeout)*time.Second)
 	defer cancel()
-	args := []string{
-		fmt.Sprintf("-I=%s", tempPath),
+
+	args := make([]string, 0)
+	for _, x := range importPaths {
+		args = append(args, fmt.Sprintf("-I=%s", x))
+	}
+	args = append(args, []string{
 		"--include_imports",
 		"--include_source_info",
 		fmt.Sprintf("--descriptor_set_out=%s", filepath.Join(tempOut, "descriptor.pb")),
-	}
+	}...)
 	args = append(args, tempFilesToStrings(tempFiles, "")...)
 	out, err := exec.CommandContext(ctx,
 		config.GlobalConfig.ProtocPath,
@@ -94,6 +90,7 @@ const (
 	CompileTargetPHP
 	CompileTargetPython
 	CompileTargetRuby
+	CompileTargetGo
 )
 
 func getTargetArg(target CompileTarget) string {
@@ -116,6 +113,8 @@ func getTargetArg(target CompileTarget) string {
 		return "--python_out"
 	case CompileTargetRuby:
 		return "--ruby_out"
+	case CompileTargetGo:
+		return "--go_out"
 	default:
 		return ""
 	}
@@ -152,7 +151,6 @@ func (p Protobuf) CompileTo(target CompileTarget, prefix string) (tempOut string
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.GlobalConfig.CompileTimeout)*time.Second)
 	defer cancel()
 	args := []string{
-		//fmt.Sprintf("-I=%s", rawPath),
 		fmt.Sprintf("--descriptor_set_in=%s", descriptorSet),
 		fmt.Sprintf("%s=%s", getTargetArg(target), out),
 	}

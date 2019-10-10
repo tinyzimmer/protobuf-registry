@@ -11,8 +11,8 @@ import {
   Spinner,
   Tag,
   Collapse,
-  HTMLTable
 } from "@blueprintjs/core";
+import ProtoDocTables from './docs/proto-doc-tables.jsx';
 
 const Header = () => {
   return (
@@ -149,6 +149,9 @@ class ProtoBrowser extends Component {
       return results.json()
     }).then(data => {
       this.setState({
+        docContents: {files: [], scalarValueTypes: []}
+      })
+      this.setState({
         docContents: {
           files: data.files,
           scalarValueTypes: data.scalarValueTypes
@@ -279,7 +282,8 @@ class ProtoBrowser extends Component {
           <div className="wrapper">
             <div
               hidden={this.state.nodes.length === 0 || this.state.loading}
-              style={{paddingRight: '2em', height: '700px', overflowX: 'hidden', overflowY: 'auto', display: 'flex', flexDirection: "row"}}>
+              style={{paddingRight: '2em', height: '700px', overflowX: 'auto', overflowY: 'auto', display: 'flex', flexDirection: "column"}}
+            >
                 <Tree
                   contents={this.state.nodes}
                   onNodeClick={this.handleNodeClick}
@@ -289,7 +293,7 @@ class ProtoBrowser extends Component {
                 />
             </div>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <div hidden={this.state.fileViewHidden} style={{width: '65%'}}>
+            <div hidden={this.state.fileViewHidden} style={{width: '90%'}}>
               <Card elevation="3" className="bp3-dark" style={{width: '100%'}}>
                 <Breadcrumbs currentBreadcumbRenderer={this.renderCurrentBreadcrumb} items={this.state.breadcrumbs} />
                 <br></br>
@@ -307,15 +311,7 @@ class ProtoBrowser extends Component {
                 <Collapse isOpen={this.state.docTextExpanded}>
                   <div>
                     {this.state.docContents.files.length && this.state.docContents.files.map((file, index) => {
-                      return (
-                        <div key={index}>
-                          <div align="center">
-                          <h4>{file.name}</h4>
-                          </div>
-                          <i>{file.description}</i>
-                          <strong>{file.package}</strong>
-                        </div>
-                      );
+                      return <ProtoDocTables key={index} docs={file} />
                     })}
                   </div>
                 </Collapse>
