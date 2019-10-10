@@ -55,7 +55,9 @@ func (api *apiServer) getRawProtoFile(w http.ResponseWriter, r *http.Request) {
 		common.BadRequest(err, w)
 		return
 	}
-	common.WriteRawResponse(out, w)
+	common.WriteJSONResponse(map[string]string{
+		"content": string(out),
+	}, w)
 }
 
 func (api *apiServer) getMetaForProtoFile(w http.ResponseWriter, r *http.Request) {

@@ -1,7 +1,7 @@
 GOLANGCI_VERSION = 1.18.0
 
 IMG ?= protobuf-registry:latest
-NUM ?= 10
+NUM ?= 1
 
 build:
 	docker build . -t ${IMG}

@@ -81,7 +81,7 @@ func resolveURL(in string) (u *url.URL, subPath string, err error) {
 		u.Scheme = "https"
 	}
 	split := strings.Split(u.Path, "/")
-	if len(split) >= 4 {
+	if len(split) > 3 {
 		u.Path = strings.Join(split[0:3], "/")
 		subPath = strings.Join(split[3:len(split)-1], "/")
 	}

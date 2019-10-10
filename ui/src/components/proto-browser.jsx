@@ -123,8 +123,8 @@ class ProtoBrowser extends Component {
     // fetch file text
     fetch(url)
     .then(results => {
-      return results.text()
-    }).then(fileText => {
+      return results.json()
+    }).then(res => {
       var crumbs = [
         { icon: 'globe-network', text: nodeData.parent },
         { icon: 'git-merge', text: nodeData.version },
@@ -139,7 +139,12 @@ class ProtoBrowser extends Component {
       })
       crumbs.push({ icon: 'document-open', text: nodeData.label })
       this.setState({breadcrumbs: crumbs})
-      this.setState({fileText: fileText})
+
+      if (res.error !== undefined) {
+        this.setState({fileText: "// " + nodeData.fullPath.substr(1) + " appears to be a remote import to this package"})
+      }  else {
+        this.setState({fileText: res.content})
+      }
     })
 
     // fetch file docs
@@ -148,9 +153,6 @@ class ProtoBrowser extends Component {
     .then(results => {
       return results.json()
     }).then(data => {
-      this.setState({
-        docContents: {files: [], scalarValueTypes: []}
-      })
       this.setState({
         docContents: {
           files: data.files,
@@ -311,7 +313,7 @@ class ProtoBrowser extends Component {
                 <Collapse isOpen={this.state.docTextExpanded}>
                   <div>
                     {this.state.docContents.files.length && this.state.docContents.files.map((file, index) => {
-                      return <ProtoDocTables key={index} docs={file} />
+                      return <ProtoDocTables key={file.name} docs={file} />
                     })}
                   </div>
                 </Collapse>

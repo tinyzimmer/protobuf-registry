@@ -193,50 +193,62 @@ class UploadForm extends React.Component {
           className="bp3-dark"
         >
           <div className={Classes.DIALOG_BODY}>
-            <div className="upload-form-container">
-              <div className="upload-form">
-                <div className="upload-form-item">
-                  <InputGroup
-                    round
-                    onChange={this.handleNameChange}
-                    intent={this.state.nameIntent}
-                    placeholder="Package name (required)"
-                    leftIcon="bookmark"
-                  />
-                </div>
-                <div className="upload-form-item">
-                  <InputGroup
-                    round
-                    onChange={this.handleVersionChange}
-                    intent="primary"
-                    placeholder="Version: 0.0.1"
-                    leftIcon="git-branch"
-                  />
-                </div>
-                <br ></br>
-                <div className="upload-form-item">
-                  <FileInput
-                    style={{width: this.state.fileInputWidth}}
-                    intent={this.state.fileIntent}
-                    text={this.state.fileInputText}
-                    onInputChange={this.handleFileInput}
-                  />
-                </div>
-                <div className="upload-form-item" hidden={this.state.fileCaptionHidden}>
-                  <Text>{this.state.fileInputCaption}</Text>
-                </div>
-                <br></br>
-                <div className="upload-form-item">
-                  <Button
-                    intent="primary"
-                    onClick={this.handleSubmit}
-                    style={{width: "75px"}}
-                     className={this.state.wiggling ? "wiggle" : ""}
-                  >
-                    Upload
-                  </Button>
+            <div className="wrapper">
+
+              <div className="upload-form-container">
+                <div className="upload-form">
+                  <div className="upload-form-item">
+                    <InputGroup
+                      round
+                      onChange={this.handleNameChange}
+                      intent={this.state.nameIntent}
+                      placeholder="Package name (required)"
+                      leftIcon="bookmark"
+                    />
+                  </div>
+                  <div className="upload-form-item">
+                    <InputGroup
+                      round
+                      onChange={this.handleVersionChange}
+                      intent="primary"
+                      placeholder="Version: 0.0.1"
+                      leftIcon="git-branch"
+                    />
+                  </div>
+                  <br ></br>
+                  <div className="upload-form-item">
+                    <FileInput
+                      style={{width: this.state.fileInputWidth}}
+                      intent={this.state.fileIntent}
+                      text={this.state.fileInputText}
+                      onInputChange={this.handleFileInput}
+                    />
+                  </div>
+                  <div className="upload-form-item" hidden={this.state.fileCaptionHidden}>
+                    <Text>{this.state.fileInputCaption}</Text>
+                  </div>
+                  <br></br>
+                  <div className="upload-form-item">
+                    <Button
+                      intent="primary"
+                      onClick={this.handleSubmit}
+                      style={{width: "75px"}}
+                       className={this.state.wiggling ? "wiggle" : ""}
+                    >
+                      Upload
+                    </Button>
+                  </div>
                 </div>
               </div>
+              <br></br>
+              <div className="upload-form-container">
+                <div className="upload-form">
+                  <div className="upload-form-item">
+                    <Button>text</Button>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </Dialog>
