@@ -54,10 +54,8 @@ run_persistent: build
 	docker run \
 		--rm \
 		-p 8080:8080 \
-		-v "`pwd`/data:/data" \
+		-v "`pwd`/data:/opt/proto-registry/data" \
 		-e PROTO_REGISTRY_PERSIST_MEMORY=true \
-		-e PROTO_REGISTRY_ENABLE_CORS=true \
-		-e PROTO_REGISTRY_PRE_CACHED_REMOTES="github.com/googleapis/googleapis" \
 		${IMG}
 
 test_data:

@@ -57,6 +57,7 @@ class UploadForm extends React.Component {
       packageVersion: "0.0.1",
       packageBody: "",
       wiggling: false,
+      submitting: false,
     }
     this.wiggleTimeoutId = 3
     this.toaster = toaster
@@ -181,10 +182,13 @@ class UploadForm extends React.Component {
     } else if (this.state.packageBody === "") {
       this.wiggle()
       this.setState({fileIntent: "danger"})
+      return
     }
+    this.setState({submitting: true})
     fetch(this.postURL, {method: "POST", body: JSON.stringify(postBody)}).then(results => {
       return results.json()
     }).then(result => {
+      this.setState({submitting: false})
       this.handleSubmitResult(result)
     })
   }
@@ -245,6 +249,7 @@ class UploadForm extends React.Component {
                       intent="primary"
                       onClick={this.handleSubmit}
                       style={{width: "75px"}}
+                      loading={this.state.submitting}
                       className={this.state.wiggling ? "wiggle" : ""}
                     >
                       Upload
@@ -254,9 +259,7 @@ class UploadForm extends React.Component {
               </div>
 
               <br></br>
-
               <RemoteDepSelect ref={this.remoteDeps} />
-
             </div>
           </div>
         </Dialog>

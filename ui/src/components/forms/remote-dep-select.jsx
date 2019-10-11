@@ -24,7 +24,10 @@ class RemoteDepSelect extends Component {
     .then(results => {
       return results.json()
     }).then(remotes => {
-      knownRemotes = remotes
+      remotes.map((v, i) => {
+        knownRemotes.push(remotes)
+        return ''
+      })
       this.setState({knownRemotes: knownRemotes})
     })
   }
@@ -118,6 +121,7 @@ class RemoteDepSelect extends Component {
                   itemRenderer={this.renderItem}
                   inputValueRenderer={this.renderInput}
                   value={this.state.deps[index].revision}
+                  fill={true}
                   inputProps={{
                     round: true,
                     intent: 'primary',
@@ -126,6 +130,7 @@ class RemoteDepSelect extends Component {
                     value: dep.url
                   }}
                 />
+                <br></br>
                 <InputGroup
                   round
                   onChange={(ev) => this.handleRevChange(ev, index)}
@@ -134,14 +139,13 @@ class RemoteDepSelect extends Component {
                   leftIcon="git-branch"
                   value={this.state.deps[index].revision}
                 />
-                <Button onClick={() => this.deleteDep(index)} icon="delete" small></Button>
+              <Button minimal={true} onClick={() => this.deleteDep(index)} icon="delete" small></Button>
               </div>
               <br></br>
             </div>
           );
         })}
         <Tag
-          fill={true}
           icon="add"
           interactive={true}
           round={true}

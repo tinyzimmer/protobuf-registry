@@ -55,13 +55,12 @@ FROM alpine
 RUN apk add --update protobuf protobuf-dev
 
 # setup a user and data directories
-RUN adduser -u 1000 -h /opt/proto-registry -s /bin/false -D protoregistry && \
-  mkdir -p /data && \
-  chown -R protoregistry: /data
+RUN adduser -u 1000 -h /opt/proto-registry -s /bin/false -D protoregistry
 
 USER protoregistry
-
 WORKDIR /opt/proto-registry
+
+RUN mkdir /opt/proto-registry/data
 
 # Copy API assets
 COPY --from=apibuilder /workspace/app /opt/proto-registry/app

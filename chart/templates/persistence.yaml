@@ -1,0 +1,19 @@
+{{ if .Values.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+{{ include "chart.labels" . | indent 4 }}
+  name: {{ include "chart.fullname" . }}-persistence
+spec:
+  {{- with .Values.persistence.accessModes }}
+  accessModes:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.capacity }}
+  {{- if .Values.persistence.storageClass }}
+  storageClassName: {{ .Values.persistence.storageClass }}
+  {{- end }}
+{{ end }}

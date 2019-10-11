@@ -37,8 +37,7 @@ post-test-data() {
           \"body\": \"${b64data}\",
           \"remoteDeps\": [
             {
-              \"url\": \"github.com/googleapis/googleapis\",
-              \"revision\": \"common-protos-1_3_1\"
+              \"url\": \"github.com/googleapis/api-common-protos\"
             }
           ]
         }"

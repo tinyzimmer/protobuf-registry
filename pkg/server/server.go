@@ -78,6 +78,7 @@ func (c *coreServer) InitController(conf *config.Config) (*common.ServerControll
 func (c *coreServer) configureRouter(ctrl *common.ServerController) *mux.Router {
 	// new base router
 	router := mux.NewRouter()
+	router.HandleFunc("/healthz", healthz).Methods("GET")
 	// UI router
 	router.PathPrefix("/ui").Handler(http.StripPrefix("/ui", http.FileServer(http.Dir("./static"))))
 	// main API
@@ -106,4 +107,10 @@ func (c *coreServer) ListenAndServe() error {
 
 func (c *coreServer) Shutdown(ctx context.Context) error {
 	return c.srvr.Shutdown(ctx)
+}
+
+func healthz(w http.ResponseWriter, r *http.Request) {
+	common.WriteJSONResponse(map[string]string{
+		"status": "ok",
+	}, w)
 }

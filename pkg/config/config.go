@@ -56,7 +56,7 @@ type Config struct {
 	StorageDriver string `envconfig:"storage_driver" default:"file" json:"storage_driver"`
 
 	// File Storage settings
-	FileStoragePath string `envconfig:"file_storage_path" default:"/data" json:"file_storage_path"`
+	FileStoragePath string `envconfig:"file_storage_path" default:"/opt/proto-registry/data" json:"file_storage_path"`
 
 	// Memory database settings
 	PersistMemoryToDisk bool `envconfig:"persist_memory" default:"false" json:"persist_memory"`
