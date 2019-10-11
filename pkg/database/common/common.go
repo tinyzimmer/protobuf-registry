@@ -26,7 +26,7 @@ type DBEngine interface {
 
 	GetAllProtoVersions() (map[string][]*protobuf.Protobuf, error)
 	GetProtoVersions(name string) ([]*protobuf.Protobuf, error)
-	StoreProtoVersion(*protobuf.Protobuf) (*protobuf.Protobuf, error)
+	StoreProtoVersion(*protobuf.Protobuf, bool) (*protobuf.Protobuf, error)
 
 	RemoveProtoVersion(*protobuf.Protobuf) error
 	RemoveAllVersionsForProto(name string) error

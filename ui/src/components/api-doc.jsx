@@ -35,6 +35,8 @@ class DocCollapse extends React.Component {
     } else if (this.state.data.method === "DELETE") {
       intent = "danger"
       icon = "cross"
+    } else if (this.state.data.method === "PUT") {
+      icon = "confirm"
     }
     return (
       <Card className="bp3-dark" elevation={Elevation.THREE}>
@@ -43,7 +45,7 @@ class DocCollapse extends React.Component {
           &nbsp;&nbsp;<strong>{this.state.data.path}</strong>
         </div>
         <Collapse isOpen={this.state.isOpen} keepChildrenMounted={true}>
-            <Pre>{this.state.data.description}</Pre>
+          <Pre>Path regex: {this.state.data.pathRegex}{"\n\n"}{this.state.data.description}</Pre>
         </Collapse>
       </Card>
     );
@@ -74,11 +76,13 @@ class APIDoc extends Component {
     return (
       <div align="center">
         <Header />
+        <br></br>
         <div align="center" hidden={!this.state.loading}>
           <Spinner size={Spinner.SIZE_LARGE}></Spinner>
         </div>
         <div align="left" style={{paddingLeft: '10em', paddingRight: '10em'}}>
           {this.state.routes.map((route, index) => {
+            if (route.path == "/healthz") { return }
             return (
               <div>
                 <DocCollapse key={index} data={route} />

@@ -107,19 +107,25 @@ func (m *memoryDatabase) GetProtoVersions(name string) ([]*protobuf.Protobuf, er
 	return nil, dbcommon.NewError(&dbcommon.ProtobufNotExists{}, fmt.Errorf("No protobuf %s in registry", name))
 }
 
-func (m *memoryDatabase) StoreProtoVersion(proto *protobuf.Protobuf) (*protobuf.Protobuf, error) {
+func (m *memoryDatabase) StoreProtoVersion(proto *protobuf.Protobuf, force bool) (*protobuf.Protobuf, error) {
 	m.mux.Lock()
 	defer m.mux.Unlock()
 	if proto.ID == nil || *proto.ID == "" {
 		proto.ID = util.StringPtr(util.RandomString(32))
 	}
+
 	if existing, ok := m.protoBufs[*proto.Name]; ok {
 		for _, x := range existing {
 			if *x.Version == *proto.Version {
-				return proto, fmt.Errorf("%s %s already exists", *proto.Name, *proto.Version)
+				if force {
+					proto.ID = x.ID
+				} else {
+					return proto, fmt.Errorf("%s %s already exists", *proto.Name, *proto.Version)
+				}
 			}
 		}
 	}
+
 	proto.LastUpdated = time.Now().UTC()
 	m.addProtobuf(proto)
 	if m.persistToDisk {

@@ -52,6 +52,10 @@ func RegisterRoutes(router *mux.Router, path string, ctrl *common.ServerControll
 		Methods("OPTIONS", "POST")
 
 	apiRouter.HandleFunc("/proto",
+		api.putProtoHandler).
+		Methods("OPTIONS", "PUT")
+
+	apiRouter.HandleFunc("/proto",
 		api.getAllProtoHandler).
 		Methods("GET")
 

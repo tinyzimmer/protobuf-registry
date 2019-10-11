@@ -29,15 +29,37 @@ var routeDocumentation = map[string]map[string]string{
 
 	"/api/proto": {
 		"GET": `Retrieve all protobuf specs currently in the registry`,
+		"PUT": `Upload new protobuf spec, overwriting an existing one with the same name and version if it exists.
+
+See POST /api/proto for more details`,
 		"POST": `Upload new protobuf spec to the registry
 
-Example Payload
----------------
+Example Payloads
+----------------
+
+Self-contained package
+
 {
   "name": "package_name",
   "version": "package_version (default: 0.0.1)",
   "body": "<base64_encoded_zip>"
-}`,
+}
+
+Package with remote imports
+
+{
+  "name": "package_name",
+  "version": "package_version (default: 0.0.1)",
+  "body": "<base64_encoded_zip>",
+  "remoteDeps": [
+    {
+      "url": "github.com/googleapis/api-common-protos",
+      "revision": "master"
+    }
+  ]
+}
+
+Note that packages with remote imports will seek to fetch them mid-flight if they are not already cached via /api/remotes or the environment.`,
 	},
 
 	"/api/proto/{name}": {
@@ -64,7 +86,7 @@ descriptors (descriptor set)
 cpp
 csharp
 java
-javanano
+javanano (not functional)
 js
 objc
 php
@@ -81,10 +103,22 @@ This may be adapted to return a list of filenames when a directory is provided.`
 	},
 
 	"/api/proto/{name}/{version}/meta/{filename}": {
-		"GET": `Retrieves data to construct a table based off the specs within {filename} of package {name} version {version}.`,
+		"GET": `Retrieves documentation for the data within {filename} of package {name} version {version}.`,
 	},
 
-	"/pip/{name}": {
+	"/api/remotes": {
+		"GET": "Retrieve a list of the currently cached remotes.",
+		"PUT": `Ensure a remote is cached in the server.
+
+Example payload
+---------------
+{
+  "url": "github.com/googleapis/api-common-protos"
+}
+`,
+	},
+
+	"/pip/{name}/": {
 		"GET": `Used for pip discovery - returns a list of available packages for spec {name} as parsed by pip.
 
 Usage
