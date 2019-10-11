@@ -18,7 +18,7 @@ class MessageTables extends Component {
               </div>
               <br></br>
               <div>
-                <Tag large={true} >{msg.fullName}</Tag>&nbsp;&nbsp;
+                <Tag minimal={true} large={true} >{msg.fullName}</Tag>&nbsp;&nbsp;
                 <Pre>{msg.description}</Pre>
               </div>
               <br></br>

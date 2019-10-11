@@ -40,6 +40,8 @@ func (api *apiServer) downloadProtoHandler(w http.ResponseWriter, r *http.Reques
 	version := common.GetVersion(r)
 	language := getLanguage(r)
 	var protos []*protobuf.Protobuf
+
+	log.Info("Serving download request for proto package", "name", name, "version", version, "language", language)
 	if protos, err = api.DB().GetProtoVersions(name); err != nil {
 		common.BadRequest(err, w)
 		return

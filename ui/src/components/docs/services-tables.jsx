@@ -18,7 +18,7 @@ class ServicesTables extends Component {
               </div>
               <br></br>
               <div>
-                <Tag>{svc.fullName}</Tag>&nbsp;&nbsp;
+                <Tag minimal={true}>{svc.fullName}</Tag>&nbsp;&nbsp;
                 <i>{svc.description}</i>
               </div>
               <br></br>

@@ -37,6 +37,8 @@ func (api *apiServer) getRawProtoFile(w http.ResponseWriter, r *http.Request) {
 	var err error
 	name, version, filename := getFileVars(r, "raw")
 	var protos []*protobuf.Protobuf
+
+	log.Info("Fetching raw file contents for proto file", "name", name, "version", version, "filename", filename)
 	if protos, err = api.DB().GetProtoVersions(name); err != nil {
 		common.BadRequest(err, w)
 		return
@@ -64,6 +66,8 @@ func (api *apiServer) getMetaForProtoFile(w http.ResponseWriter, r *http.Request
 	var err error
 	name, version, filename := getFileVars(r, "meta")
 	var protos []*protobuf.Protobuf
+
+	log.Info("Fetching documentation for proto file", "name", name, "version", version, "filename", filename)
 	if protos, err = api.DB().GetProtoVersions(name); err != nil {
 		common.BadRequest(err, w)
 		return

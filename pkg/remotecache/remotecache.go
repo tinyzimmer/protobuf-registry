@@ -19,14 +19,15 @@ package remotecache
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/go-logr/glogr"
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 	"github.com/tinyzimmer/protobuf-registry/pkg/types"
-	"gopkg.in/src-d/go-git.v4"
 )
 
 var cache *RemoteCache
@@ -64,39 +65,59 @@ func newCache() *RemoteCache {
 	}
 }
 
-func (c *RemoteCache) GetGitDependency(dep *types.ProtoDependency) (gdep *GitDependency, err error) {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-	cloneURL, subPath, err := resolveURL(dep.URL)
+func (c *RemoteCache) GetAllRemotes() (remotes []string, err error) {
+	var dirs []os.FileInfo
+	remotes = make([]string, 0)
+	dirs, err = ioutil.ReadDir(c.cacheRoot)
 	if err != nil {
 		return
 	}
-	path := filepath.Join(c.cacheRoot, cloneURL.Path)
-	// check if we already have a cached clone
-	if _, err = os.Stat(path); err == nil {
-		gdep = &GitDependency{
-			LocalPath:    path,
-			LocalSubPath: subPath,
-			Revision:     dep.Revision,
-			ImportPath:   dep.Path,
+	for _, x := range dirs {
+		if x.IsDir() {
+			var dirRemotes []string
+			dirRemotes, err = c.enumerateHostDir(filepath.Join(c.cacheRoot, x.Name()))
+			if err != nil {
+				return
+			}
+			remotes = append(remotes, dirRemotes...)
 		}
-		err = gdep.Checkout()
-		return
 	}
-	cloneOpts := &git.CloneOptions{
-		URL: cloneURL.String(),
-	}
-	log.Info(fmt.Sprintf("Cloning %s", cloneOpts.URL))
-	_, err = git.PlainClone(path, false, cloneOpts)
+	return
+}
+
+func (c *RemoteCache) enumerateHostDir(dir string) (remotes []string, err error) {
+	var dirs []os.FileInfo
+	remotes = make([]string, 0)
+	dirs, err = ioutil.ReadDir(dir)
 	if err != nil {
 		return
 	}
-	gdep = &GitDependency{
-		LocalPath:    path,
-		LocalSubPath: subPath,
-		Revision:     dep.Revision,
-		ImportPath:   dep.Path,
+	for _, x := range dirs {
+		if x.IsDir() {
+			var dirRemotes []string
+			dirRemotes, err = c.enumerateGroupDir(filepath.Join(dir, x.Name()))
+			if err != nil {
+				return
+			}
+			remotes = append(remotes, dirRemotes...)
+		}
 	}
-	err = gdep.Checkout()
+	return
+}
+
+func (c *RemoteCache) enumerateGroupDir(dir string) (remotes []string, err error) {
+	var dirs []os.FileInfo
+	remotes = make([]string, 0)
+	dirs, err = ioutil.ReadDir(dir)
+	if err != nil {
+		return
+	}
+	for _, x := range dirs {
+		if x.IsDir() {
+			remotes = append(remotes,
+				strings.Replace(filepath.Join(dir, x.Name()), c.cacheRoot+"/", "", 1),
+			)
+		}
+	}
 	return
 }

@@ -299,7 +299,7 @@ class ProtoBrowser extends Component {
               <Card elevation="3" className="bp3-dark" style={{width: '100%'}}>
                 <Breadcrumbs currentBreadcumbRenderer={this.renderCurrentBreadcrumb} items={this.state.breadcrumbs} />
                 <br></br>
-                <Tag interactive icon={this.state.fileTextExpanded ? "caret-down" : "caret-right"} onClick={this.handleFileContentsClick}>File Contents</Tag>
+                <Tag minimal={true} interactive icon={this.state.fileTextExpanded ? "caret-down" : "caret-right"} onClick={this.handleFileContentsClick}>File Contents</Tag>
                 <Collapse isOpen={this.state.fileTextExpanded}>
                   <SyntaxHighlighter language="protobuf" style={atomOneDark}>
                     {this.state.fileText}
@@ -307,7 +307,7 @@ class ProtoBrowser extends Component {
                 </Collapse>
                 <br></br>
                 <br></br>
-                <Tag interactive icon={this.state.docTextExpanded ? "caret-down" : "caret-right"} onClick={this.handleDocContentsClick}>Documentation</Tag>
+                <Tag minimal={true} interactive icon={this.state.docTextExpanded ? "caret-down" : "caret-right"} onClick={this.handleDocContentsClick}>Documentation</Tag>
                 <br></br>
                 <br></br>
                 <Collapse isOpen={this.state.docTextExpanded}>

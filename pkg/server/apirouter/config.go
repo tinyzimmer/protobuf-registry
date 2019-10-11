@@ -25,5 +25,6 @@ import (
 )
 
 func (api *apiServer) getConfigHandler(w http.ResponseWriter, r *http.Request) {
+	log.Info("Fetching server configuration...")
 	common.WriteJSONResponse(config.GlobalConfig, w)
 }

@@ -28,6 +28,8 @@ import (
 func (api *apiServer) getAllProtoHandler(w http.ResponseWriter, r *http.Request) {
 	var protos map[string][]*protobuf.Protobuf
 	var err error
+
+	log.Info("Fetching list of all protobuf packages...")
 	if protos, err = api.DB().GetAllProtoVersions(); err != nil {
 		common.BadRequest(err, w)
 		return
@@ -54,6 +56,8 @@ func (api *apiServer) getProtoHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	name := common.GetName(r)
 	var protos []*protobuf.Protobuf
+
+	log.Info("Fetching versions for protobuf package", "name", name)
 	if protos, err = api.DB().GetProtoVersions(name); err != nil {
 		if dbcommon.IsProtobufNotExists(err) {
 			common.NotFound(err, w)
@@ -71,6 +75,8 @@ func (api *apiServer) getProtoVersionMetaHandler(w http.ResponseWriter, r *http.
 	name := common.GetName(r)
 	version := common.GetVersion(r)
 	var protos []*protobuf.Protobuf
+
+	log.Info("Fetching meta for version of proto package", "name", name, "version", version)
 	if protos, err = api.DB().GetProtoVersions(name); err != nil {
 		if dbcommon.IsProtobufNotExists(err) {
 			common.NotFound(err, w)

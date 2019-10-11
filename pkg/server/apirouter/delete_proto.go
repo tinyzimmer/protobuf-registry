@@ -42,6 +42,8 @@ func (api *apiServer) deleteAllProtoVersionsHandler(w http.ResponseWriter, r *ht
 	var err error
 	name := common.GetName(r)
 	var protos []*protobuf.Protobuf
+
+	log.Info("Deleting all versions of protobuf package", "package", name)
 	if protos, err = api.DB().GetProtoVersions(name); err != nil {
 		if dbcommon.IsProtobufNotExists(err) {
 			common.NotFound(err, w)
@@ -80,6 +82,8 @@ func (api *apiServer) deleteProtoVersionHandler(w http.ResponseWriter, r *http.R
 	name := common.GetName(r)
 	version := common.GetVersion(r)
 	var protos []*protobuf.Protobuf
+
+	log.Info("Deleting single version of protobuf package", "package", name, "version", version)
 	if protos, err = api.DB().GetProtoVersions(name); err != nil {
 		if dbcommon.IsProtobufNotExists(err) {
 			common.NotFound(err, w)

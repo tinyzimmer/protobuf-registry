@@ -42,6 +42,7 @@ type Route struct {
 }
 
 func (api *apiServer) walkRouter(w http.ResponseWriter, r *http.Request) {
+	log.Info("Fetching API documentation...")
 	res := newWalkResponse()
 	err := api.router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		pathTemplate, err := route.GetPathTemplate()

@@ -10,6 +10,8 @@ import {
   Toaster,
 } from "@blueprintjs/core";
 
+import RemoteDepSelect from './forms/remote-dep-select.jsx';
+
 const toaster = Toaster.create()
 
 function getReadableFileSizeString(fileSizeInBytes) {
@@ -67,6 +69,9 @@ class UploadForm extends React.Component {
     this.handleVersionChange = this.handleVersionChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleSubmitResult = this.handleSubmitResult.bind(this)
+    this.handleDepChange = this.handleDepChange.bind(this);
+
+    this.remoteDeps = React.createRef();
   }
 
   clear() {
@@ -81,6 +86,7 @@ class UploadForm extends React.Component {
       packageName: "",
       packageVersion: "0.0.1",
       packageBody: "",
+      packageDeps: [],
       wiggling: false,
     })
   }
@@ -139,6 +145,10 @@ class UploadForm extends React.Component {
     }
   }
 
+  handleDepChange(deps) {
+    this.setState({packageDeps: deps})
+  }
+
   handleFileInput(e) {
     var file = e.target.files[0]
     getBase64(file).then( data => {
@@ -157,10 +167,12 @@ class UploadForm extends React.Component {
   }
 
   handleSubmit(e) {
+    console.log(this.remoteDeps.current.state.deps)
     var postBody = {
       name: this.state.packageName,
       version: this.state.packageVersion,
       body: this.state.packageBody,
+      remoteDeps: this.remoteDeps.current.state.deps,
     }
     if (this.state.packageName === "") {
       this.wiggle()
@@ -189,7 +201,7 @@ class UploadForm extends React.Component {
           canEscapeKeyClose={true}
           canOutsideClickClose={true}
           isCloseButtonShown={false}
-          style={{width:'800px'}}
+          style={{width:'1000px'}}
           className="bp3-dark"
         >
           <div className={Classes.DIALOG_BODY}>
@@ -233,21 +245,17 @@ class UploadForm extends React.Component {
                       intent="primary"
                       onClick={this.handleSubmit}
                       style={{width: "75px"}}
-                       className={this.state.wiggling ? "wiggle" : ""}
+                      className={this.state.wiggling ? "wiggle" : ""}
                     >
                       Upload
                     </Button>
                   </div>
                 </div>
               </div>
+
               <br></br>
-              <div className="upload-form-container">
-                <div className="upload-form">
-                  <div className="upload-form-item">
-                    <Button>text</Button>
-                  </div>
-                </div>
-              </div>
+
+              <RemoteDepSelect ref={this.remoteDeps} />
 
             </div>
           </div>

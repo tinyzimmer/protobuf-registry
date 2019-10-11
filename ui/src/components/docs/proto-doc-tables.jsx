@@ -40,7 +40,7 @@ class ProtoDocTables extends Component {
           <i>{this.docs.description}</i>
           <br></br>
           <br></br>
-          {this.docs.package && (this.docs.package !== "") ? <div><strong>Package:  </strong><Tag>{this.docs.package}</Tag></div> : ""}
+          {this.docs.package && (this.docs.package !== "") ? <div><strong>Package:  </strong><Tag minimal={true}>{this.docs.package}</Tag></div> : ""}
         </div>
         <br></br>
         <Tabs animate={true} key="horizontal" renderActiveTabPanelOnly={true} vertical={false} onChange={this.handleTabChange} selectedTabId={this.state.selectedTabId}>

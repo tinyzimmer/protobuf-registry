@@ -36,6 +36,10 @@ type PostProtoRequest struct {
 	RemoteDepends []*ProtoDependency `json:"remoteDeps,omitempty"`
 }
 
+type PutRemoteRequest struct {
+	URL string `json:"url"`
+}
+
 type ProtoDependency struct {
 	URL      string   `json:"url,omitempty"`
 	Revision string   `json:"revision,omitempty"`

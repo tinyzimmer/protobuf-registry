@@ -18,9 +18,16 @@
 package apirouter
 
 import (
+	"net/http"
+
+	"github.com/go-logr/glogr"
 	"github.com/gorilla/mux"
+	"github.com/tinyzimmer/protobuf-registry/pkg/remotecache"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 )
+
+var log = glogr.New()
 
 type apiServer struct {
 	ctrl   *common.ServerController
@@ -74,4 +81,37 @@ func RegisterRoutes(router *mux.Router, path string, ctrl *common.ServerControll
 		api.getMetaForProtoFile).
 		Methods("GET")
 
+	apiRouter.HandleFunc("/remotes",
+		api.putNewRemote).
+		Methods("OPTIONS", "PUT")
+
+	apiRouter.HandleFunc("/remotes",
+		api.getRemotes).
+		Methods("GET")
+}
+
+func (api *apiServer) putNewRemote(w http.ResponseWriter, r *http.Request) {
+	var req types.ProtoDependency
+	if err := common.UnmarshallInto(r.Body, &req); err != nil {
+		common.BadRequest(err, w)
+		return
+	}
+	log.Info("Requesting to cache new remote", "remote", req.URL)
+	if _, err := remotecache.Cache().GetGitDependency(&types.ProtoDependency{URL: req.URL, Revision: "master"}); err != nil {
+		common.BadRequest(err, w)
+		return
+	}
+	common.WriteJSONResponse(map[string]string{
+		"result": "success",
+	}, w)
+}
+
+func (api *apiServer) getRemotes(w http.ResponseWriter, r *http.Request) {
+	log.Info("Fetching list of cached remotes...")
+	remotes, err := remotecache.Cache().GetAllRemotes()
+	if err != nil {
+		common.BadRequest(err, w)
+		return
+	}
+	common.WriteJSONResponse(remotes, w)
 }

@@ -42,12 +42,14 @@ func (api *apiServer) postProtoHandler(w http.ResponseWriter, r *http.Request) {
 	var req *types.PostProtoRequest
 	var err error
 
+	log.Info("Unmarshaling new protobuf request...")
 	// unmarshall the request
 	if req, err = types.NewProtoReqFromReader(r.Body); err != nil {
 		common.BadRequest(err, w)
 		return
 	}
 
+	log.Info("Validating parameters...")
 	// validate parameters
 	if err = req.Validate(); err != nil {
 		common.BadRequest(err, w)
@@ -55,6 +57,7 @@ func (api *apiServer) postProtoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create a protobuf object from the request
+	log.Info("Validating protocol specification...")
 	proto := protobuf.NewFromRequest(req)
 	if err := proto.SetRawFromBase64(req.Body); err != nil {
 		common.BadRequest(err, w)
@@ -67,6 +70,7 @@ func (api *apiServer) postProtoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Info("Registering new package", "proto", proto)
 	// register to DB - object comes back with a generated ID if it doesn't exist
 	// this will return an error if an object with the same name and version exists
 	if proto, err = api.DB().StoreProtoVersion(proto); err != nil {
