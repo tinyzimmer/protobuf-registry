@@ -65,7 +65,7 @@ func (pip *pipServer) getPipDownloadHandler(w http.ResponseWriter, r *http.Reque
 		common.BadRequest(err, w)
 		return
 	}
-	path, rm, err := proto.CompileTo(protobuf.CompileTargetPython, *proto.Name)
+	path, rm, err := proto.GenerateTo(protobuf.GenerateTargetPython, *proto.Name)
 	if err != nil {
 		common.BadRequest(err, w)
 		return

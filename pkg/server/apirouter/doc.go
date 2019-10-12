@@ -91,6 +91,7 @@ js
 objc
 php
 python
+go
 ruby`,
 	},
 

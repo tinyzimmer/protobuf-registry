@@ -34,7 +34,6 @@ func (p *Protobuf) DocJSON(filename string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	//defer os.RemoveAll(tempPath)
 	var desc *desc.FileDescriptor
 	for _, x := range descriptors {
 		if x.GetName() == filename || x.GetName() == strings.TrimPrefix(filename, "/") {

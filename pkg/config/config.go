@@ -46,9 +46,9 @@ type Config struct {
 	WriteTimeout int    `envconfig:"write_timeout" default:"15" json:"write_timeout"`
 
 	// Protobuf Compilation Settings
-	CompileTimeout int    `envconfig:"compile_timeout" default:"10" json:"compile_timeout"`
-	ProtocPath     string `envconfig:"protoc_path" default:"/usr/bin/protoc" json:"protoc_path"`
-
+	CompileTimeout  int    `envconfig:"compile_timeout" default:"10" json:"compile_timeout"`
+	ProtocPath      string `envconfig:"protoc_path" default:"/usr/bin/protoc" json:"protoc_path"`
+	ProtocGenGoPath string `envconfig:"protoc_gen_go_path" default:"/opt/proto-registry/bin/protoc-gen-go" json:"protoc_gen_go_path"`
 	// Database Settings
 	DatabaseDriver string `envconfig:"database_driver" default:"memory" json:"database_driver"`
 

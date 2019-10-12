@@ -8,6 +8,7 @@ syntax = "proto3";
 
 import "google/api/annotations.proto";
 package com.example;
+option go_package = "example.com/proto/example";
 
 /**
  * Represents the booking status ID.

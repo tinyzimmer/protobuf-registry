@@ -64,13 +64,18 @@ func (api *apiServer) downloadProtoHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	target, err := getCompileTarget(language)
+	target, err := getGenerateTarget(language)
 	if err != nil {
 		common.BadRequest(err, w)
 		return
 	}
 
-	out, rm, err := proto.CompileTo(target, *proto.Name)
+	prefix := *proto.Name
+	if target == protobuf.GenerateTargetGo {
+		prefix = ""
+	}
+
+	out, rm, err := proto.GenerateTo(target, prefix)
 	if err != nil {
 		common.BadRequest(err, w)
 		return
@@ -87,28 +92,30 @@ func (api *apiServer) downloadProtoHandler(w http.ResponseWriter, r *http.Reques
 	common.ServeFile(w, r, filename, bytes.NewReader(archive))
 }
 
-func getCompileTarget(target string) (protobuf.CompileTarget, error) {
-	var out protobuf.CompileTarget
+func getGenerateTarget(target string) (protobuf.GenerateTarget, error) {
+	var out protobuf.GenerateTarget
 	var err error
 	switch target {
 	case "cpp":
-		out = protobuf.CompileTargetCPP
+		out = protobuf.GenerateTargetCPP
 	case "csharp":
-		out = protobuf.CompileTargetCSharp
+		out = protobuf.GenerateTargetCSharp
 	case "java":
-		out = protobuf.CompileTargetJava
+		out = protobuf.GenerateTargetJava
 	case "javanano":
-		out = protobuf.CompileTargetJavaNano
+		out = protobuf.GenerateTargetJavaNano
 	case "js":
-		out = protobuf.CompileTargetJS
+		out = protobuf.GenerateTargetJS
 	case "objc":
-		out = protobuf.CompileTargetObjC
+		out = protobuf.GenerateTargetObjC
 	case "php":
-		out = protobuf.CompileTargetPHP
+		out = protobuf.GenerateTargetPHP
 	case "python":
-		out = protobuf.CompileTargetPython
+		out = protobuf.GenerateTargetPython
 	case "ruby":
-		out = protobuf.CompileTargetRuby
+		out = protobuf.GenerateTargetRuby
+	case "go":
+		out = protobuf.GenerateTargetGo
 	default:
 		err = errors.New("Unknown target")
 	}

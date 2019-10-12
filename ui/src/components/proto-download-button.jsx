@@ -3,9 +3,9 @@ import { AnchorButton } from "@blueprintjs/core";
 
 const formats = [
   "raw",
+  "go",
   "python",
   "java",
-  "javanano",
   "cpp",
   "csharp",
   "objc",

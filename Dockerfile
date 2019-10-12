@@ -9,6 +9,9 @@ RUN apk add --update curl git upx curl unzip autoconf automake libtool make g++ 
 
 WORKDIR /workspace
 
+RUN GOPATH=/workspace/go go get -d -u github.com/golang/protobuf/protoc-gen-go && \
+    GOPATH=/workspace/go go install github.com/golang/protobuf/protoc-gen-go
+
 # Do go deps first
 COPY go.mod go.mod
 COPY go.sum go.sum
@@ -64,6 +67,7 @@ RUN mkdir /opt/proto-registry/data
 
 # Copy API assets
 COPY --from=apibuilder /workspace/app /opt/proto-registry/app
+COPY --from=apibuilder /workspace/go/bin/protoc-gen-go  /opt/proto-registry/bin/protoc-gen-go
 
 # Copy UI assets
 COPY --from=uibuilder /workspace/ui/build /opt/proto-registry/static

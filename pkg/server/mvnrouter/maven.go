@@ -119,7 +119,7 @@ func (mvn *mavenServer) getMavenPkgBoilerplate(w http.ResponseWriter, r *http.Re
 		common.BadRequest(err, w)
 		return
 	}
-	path, rm, err := proto.CompileTo(protobuf.CompileTargetJava, getPathPrefix(proto))
+	path, rm, err := proto.GenerateTo(protobuf.GenerateTargetJava, getPathPrefix(proto))
 	if err != nil {
 		common.BadRequest(err, w)
 		return

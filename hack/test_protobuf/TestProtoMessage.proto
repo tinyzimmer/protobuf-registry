@@ -7,6 +7,7 @@
 
 syntax = "proto3";
 
+option go_package = "example.com/proto/example";
 option java_package = "com.example.test.data";
 option java_outer_classname = "TestDataProtos";
 
