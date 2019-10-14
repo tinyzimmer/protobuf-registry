@@ -37,10 +37,17 @@ test: fmt vet
 	go test ./pkg/... -coverprofile cover.out -covermode=atomic -race
 
 # Runs tests and outputs total coverage
-coverage: test
+coverage:
 	go get golang.org/x/tools/cmd/cover
 	go get github.com/mattn/goveralls
-	$(shell go env GOPATH)/bin/goveralls -coverprofile=cover.out -service=github-actions -repotoken ${COVERALLS_TOKEN} ./pkg/...
+	$(shell go env GOPATH)/bin/goveralls \
+		-show -debug \
+		-covermode=atomic \
+		-coverprofile=cover.out \
+		-service=github-actions \
+		-repotoken ${COVERALLS_TOKEN} \
+		-race \
+		-package ./pkg/...
 
 ui/node_modules:
 	cd ui && npm install
