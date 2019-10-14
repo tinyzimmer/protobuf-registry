@@ -68,6 +68,8 @@ func (m *memoryDatabase) addProtobuf(proto *protobuf.Protobuf) {
 }
 
 func remove(s []*protobuf.Protobuf, i int) []*protobuf.Protobuf {
+	// move to end of slice
 	s[len(s)-1], s[i] = s[i], s[len(s)-1]
+	// pop it off the end
 	return s[:len(s)-1]
 }

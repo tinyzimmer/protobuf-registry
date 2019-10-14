@@ -15,23 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
-package common
+package database
 
 import (
 	"reflect"
+	"testing"
+
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 )
 
-type ProtobufNotExists struct{ error }
-
-func IsProtobufNotExists(err error) bool {
-	return reflect.TypeOf(err).Name() == reflect.TypeOf(ProtobufNotExists{}).Name()
-}
-
-func NewError(errType interface{}, err error) error {
-	switch errType.(type) {
-	case ProtobufNotExists:
-		return ProtobufNotExists{err}
-	default:
-		return err
+func TestGetEngine(t *testing.T) {
+	config := &config.Config{DatabaseDriver: dbEngineMemory}
+	engine := GetEngine(config)
+	if reflect.TypeOf(engine).String() != "*memory.memoryDatabase" {
+		t.Error("Expected memory database got:", reflect.TypeOf(engine).Name())
+	}
+	config.DatabaseDriver = "not-exists"
+	engine = GetEngine(config)
+	// should still return the default (and currently only) driver
+	if reflect.TypeOf(engine).String() != "*memory.memoryDatabase" {
+		t.Error("Expected memory database got:", reflect.TypeOf(engine).Name())
 	}
 }

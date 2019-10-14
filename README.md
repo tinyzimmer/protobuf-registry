@@ -3,6 +3,7 @@
 [![GPL License][gpl-img]][gpl]
 ![Build][build-img]
 ![Test][test-img]
+[![Coverage Status](https://coveralls.io/repos/github/tinyzimmer/protobuf-registry/badge.svg?branch=master)](https://coveralls.io/github/tinyzimmer/protobuf-registry?branch=master)
 [![Docker][docker-img]][docker]
 
 A repository, package manager, and file viewer for Protocol Buffers.

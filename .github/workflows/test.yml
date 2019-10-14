@@ -25,5 +25,10 @@ jobs:
     - name: Lint
       run: make lint
 
-    - name: Test
-      run: make test
+    - name: Test and Coverage
+      run: COVERALLS_TOKEN=${{ secrets.COVERALLS_TOKEN }} make coverage
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@v1.0.1
+      with:
+        github-token: ${{ secrets.github_token }}

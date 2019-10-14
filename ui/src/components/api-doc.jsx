@@ -25,7 +25,7 @@ class DocCollapse extends React.Component {
 
   render() {
     var intent = "primary"
-    var icon =""
+    var icon = ""
     if (this.state.data.method === "GET") {
       intent = "success"
       icon = "info-sign"
@@ -82,7 +82,7 @@ class APIDoc extends Component {
         </div>
         <div align="left" style={{paddingLeft: '10em', paddingRight: '10em'}}>
           {this.state.routes.map((route, index) => {
-            if (route.path == "/healthz") { return }
+            if (route.path === "/healthz") { return '' }
             return (
               <div>
                 <DocCollapse key={index} data={route} />

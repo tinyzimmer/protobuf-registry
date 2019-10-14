@@ -15,23 +15,4 @@
 // You should have received a copy of the GNU General Public License
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
-package common
-
-import (
-	"reflect"
-)
-
-type ProtobufNotExists struct{ error }
-
-func IsProtobufNotExists(err error) bool {
-	return reflect.TypeOf(err).Name() == reflect.TypeOf(ProtobufNotExists{}).Name()
-}
-
-func NewError(errType interface{}, err error) error {
-	switch errType.(type) {
-	case ProtobufNotExists:
-		return ProtobufNotExists{err}
-	default:
-		return err
-	}
-}
+package memory

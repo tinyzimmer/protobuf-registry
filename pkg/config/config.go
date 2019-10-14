@@ -19,6 +19,7 @@ package config
 
 import (
 	"encoding/json"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -32,11 +33,12 @@ const (
 
 var GlobalConfig *Config
 
-func init() {
+func Init() error {
 	var err error
 	if GlobalConfig, err = newConfig(); err != nil {
-		panic(err)
+		return err
 	}
+	return nil
 }
 
 type Config struct {
@@ -89,10 +91,14 @@ func newConfig() (*Config, error) {
 		return nil, err
 	}
 	out, err := exec.Command(c.ProtocPath, "--version").CombinedOutput()
-	if err != nil {
+	if err != nil && !ignoreNoProtoc() {
 		return nil, err
 	}
 	c.ProtobufVersion = strings.TrimSpace(string(out))
 	c.GoVersion = runtime.Version()
 	return c, nil
+}
+
+func ignoreNoProtoc() bool {
+	return strings.ToLower(os.Getenv("PROTO_REGISTRY_IGNORE_PROTOC")) == "true"
 }

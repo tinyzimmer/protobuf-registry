@@ -18,20 +18,20 @@
 package common
 
 import (
-	"reflect"
+	"errors"
+	"testing"
 )
 
-type ProtobufNotExists struct{ error }
+type randomError struct{ error }
 
-func IsProtobufNotExists(err error) bool {
-	return reflect.TypeOf(err).Name() == reflect.TypeOf(ProtobufNotExists{}).Name()
-}
+func TestProtobufNotExistsError(t *testing.T) {
+	err := NewError(ProtobufNotExists{}, errors.New("not exists"))
+	if !IsProtobufNotExists(err) {
+		t.Error("Expected protobuf not exists error to be true, got false")
+	}
 
-func NewError(errType interface{}, err error) error {
-	switch errType.(type) {
-	case ProtobufNotExists:
-		return ProtobufNotExists{err}
-	default:
-		return err
+	err = NewError(randomError{}, errors.New("random"))
+	if IsProtobufNotExists(err) {
+		t.Error("Expected protobuf not exists error to be false, got true")
 	}
 }

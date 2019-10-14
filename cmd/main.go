@@ -43,6 +43,10 @@ func main() {
 	}
 	flag.Parse()
 
+	if err := config.Init(); err != nil {
+		panic(err)
+	}
+
 	setupLog := log.WithName("setup")
 
 	// log the configuration

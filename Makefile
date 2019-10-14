@@ -4,6 +4,8 @@ IMG ?= protobuf-registry:latest
 NUM ?= 1
 REGISTRY_HOST ?= localhost:8080
 
+NUM_PACKAGES = $(shell find pkg -type d | wc -l)
+
 build:
 	docker build . -t ${IMG}
 
@@ -32,20 +34,21 @@ vet:
 
 # Run tests
 test: fmt vet
-	go test ./... -coverprofile cover.out
+	go test ./pkg/... -coverprofile cover.out -covermode=atomic -race
 
-clean:
-	rm -rf bin/
-	rm -rf data/
-	rm -rf ui/build
-	rm -rf ui/node_modules
-	rm -f cover.out
+# Runs tests and outputs total coverage
+coverage: test
+	go get golang.org/x/tools/cmd/cover
+	go get github.com/mattn/goveralls
+	goveralls -coverprofile=cover.out -service=github-actions -repotoken ${COVERALLS_TOKEN} ./pkg/...
 
-ui-deps:
+ui/node_modules:
 	cd ui && npm install
 
-build-ui: ui-deps
+ui/build: ui/node_modules
 	cd ui && npm run build
+
+build-ui: ui/build
 
 run: build
 	docker run --rm -p 8080:8080 ${IMG}
@@ -62,5 +65,12 @@ run_persistent: build
 test_data:
 	cd hack && NUM=${NUM} REGISTRY_HOST=${REGISTRY_HOST} bash add_test_data.sh
 
-run_dev_ui: ui-deps
+run_dev_ui: ui/node_modules
 	cd ui && npm start
+
+clean:
+	rm -rf bin/
+	rm -rf data/
+	rm -rf ui/build
+	rm -rf ui/node_modules
+	rm -f cover.out
