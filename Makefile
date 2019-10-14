@@ -2,6 +2,7 @@ GOLANGCI_VERSION = 1.18.0
 
 IMG ?= protobuf-registry:latest
 NUM ?= 1
+REGISTRY_HOST ?= localhost:8080
 
 build:
 	docker build . -t ${IMG}
@@ -59,7 +60,7 @@ run_persistent: build
 		${IMG}
 
 test_data:
-	NUM=${NUM} bash hack/add_test_data.sh
+	cd hack && NUM=${NUM} REGISTRY_HOST=${REGISTRY_HOST} bash add_test_data.sh
 
 run_dev_ui: ui-deps
 	cd ui && npm start

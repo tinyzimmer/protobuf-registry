@@ -30,6 +30,7 @@ import (
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/apirouter"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/gemrouter"
+	"github.com/tinyzimmer/protobuf-registry/pkg/server/gorouter"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/mvnrouter"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/piprouter"
 	"github.com/tinyzimmer/protobuf-registry/pkg/storage"
@@ -85,6 +86,7 @@ func (c *coreServer) configureRouter(ctrl *common.ServerController) *mux.Router 
 	apirouter.RegisterRoutes(router, "/api", ctrl)
 	// pkg manager routers
 	piprouter.RegisterRoutes(router, "/pip", ctrl)
+	gorouter.RegisterRoutes(router, "/golang", ctrl)
 	mvnrouter.RegisterRoutes(router, "/mvn", ctrl)
 	gemrouter.RegisterRoutes(router, "/gem", ctrl)
 	// catch-all - for debugging package discovery

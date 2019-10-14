@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "example.com/proto/example";
+option go_package = "registry.localhost/golang/test-protobuf";
 
 import "details/meta/TestProtoMessageMeta.proto";
 

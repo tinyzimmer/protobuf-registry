@@ -17,6 +17,15 @@
 
 package apirouter
 
+func GetDoc(path, method string) string {
+	if docObj, ok := routeDocumentation[path]; ok {
+		if doc, ok := docObj[method]; ok {
+			return doc
+		}
+	}
+	return "No documentation for this route"
+}
+
 var routeDocumentation = map[string]map[string]string{
 
 	"/api": {
@@ -131,6 +140,33 @@ pip install --extra-index-url http://protoregistry.example.com/pip my-app-protoc
 		"GET": `Used for pip discovery - downloads the package/version specified by {name}`,
 	},
 
+	"/golang/{name}": {
+		"GET": `Used for go-get discovery.
+
+This route will probably be configurable in the future. For now the way this functionality works is by assuming an 'option go_package' is provided in the protobuf spec.
+
+The package name should correlate to wherever you host the protobuf registry and does not need to have the same name as the protocol spec itself.
+
+For example, if the registry was running locally at "registry.localhost", you could annotate a package of any name with:
+
+'''
+option go_package = "registry.localhost/golang/test-protobuf";
+'''
+
+And then:
+
+$> go get -insecure registry.localhost/golang/test-protobuf
+go: finding registry.localhost/golang/test-protobuf latest
+go: downloading registry.localhost/golang/test-protobuf v0.0.0-20191014153456-93e6948efcdf
+go: extracting registry.localhost/golang/test-protobuf v0.0.0-20191014153456-93e6948efcdf
+go: finding google.golang.org/genproto latest
+go: downloading google.golang.org/genproto v0.0.0-20191009194640-548a555dbc03
+go: extracting google.golang.org/genproto v0.0.0-20191009194640-548a555dbc03
+
+This currently only works for the latest version of the protobuf spec. It may be adapted to supporting versions in the future.
+`,
+	},
+
 	"/mvn/{name}/{version}": {
 		"GET": `Unfornately, I don't feel like adding a java compiler to this image, but the API can still build a ready-to-go directory for packaging.
 
@@ -156,13 +192,4 @@ gem install -s http://protoregistry.example.com/gem my-app-protocol`,
 	"/gem/quick/Marshal.4.8/{name}.gemspec.rz": {
 		"GET": `(NOT WORKING) Used for rubygems discovery - returns a Gem::Specification for a given package`,
 	},
-}
-
-func GetDoc(path, method string) string {
-	if docObj, ok := routeDocumentation[path]; ok {
-		if doc, ok := docObj[method]; ok {
-			return doc
-		}
-	}
-	return "No documentation for this route"
 }

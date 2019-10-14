@@ -15,8 +15,10 @@ You can then retrieve details on your packages as well as generated code and des
 There is also a Web UI available for visualizing your packages and other ad-hoc operations.
 
 Where feasible, I want to support package manager discovery for various languages.
-This functionality already works for `pip`, however it is obviously a challenge for other ones.
+This functionality already works for `pip` and `go`, however it is obviously a challenge for other ones.
 For example, with `maven`, I'd rather not include a Java compiler with the build image, but you can still download a ready-to-package directory.
+
+### Pip discovery
 
 For the pip discovery, if you uploaded a package called `my-app-protocol` with versions `0.0.1` and `0.0.2`:
 
@@ -30,7 +32,32 @@ $> pip install --index-url http://localhost:8080/pip my-app-protocol
 $> pip install --index-url http://localhost:8080/pip my-app-protocol==0.0.1
 ```
 
-This should be possible for _most_ interpreted languages (ruby marshaling in golang is a bitch). I'm sure I can do it with `go get` also. However, at time of writing, only pip has it.
+### Gocode discovery
+
+For the go discovery, it works based off the `go_package` option supplied in the `.proto` files.
+This currently only works for the latest version of the package in the registry.
+The option value must also correlate to, or at least resolve to, wherever you host the registry.
+
+For example with a registry running locally at `http://registry.localhost` and a protocol spec (of any "package name") using:
+
+```proto
+option go_package = "registry.localhost/golang/test-protobuf";
+```
+
+You could then use `go get` to fetch the gocode like this:
+
+```bash
+$> go get -insecure registry.localhost/golang/test-protobuf
+
+go: finding registry.localhost/golang/test-protobuf latest
+go: downloading registry.localhost/golang/test-protobuf v0.0.0-20191014153456-93e6948efcdf
+go: extracting registry.localhost/golang/test-protobuf v0.0.0-20191014153456-93e6948efcdf
+go: finding google.golang.org/genproto latest
+go: downloading google.golang.org/genproto v0.0.0-20191009194640-548a555dbc03
+go: extracting google.golang.org/genproto v0.0.0-20191009194640-548a555dbc03
+```
+
+This should be possible for _most_ interpreted languages (ruby marshaling in golang is a bitch).
 
 This project was primarily just me being bored and wanting to build something, but also was an opportunity for me to finally start learning some modern front-end technologies while making the UI. However, if I decide to keep building on it, I eventually want to incorporate elements from [`prototool`](https://github.com/uber/prototool) as well. Since it's also in go it would be easy to include some of their functionality (e.g. linting).
 
@@ -67,7 +94,7 @@ $> docker run \
 The data directory will also hold the cache of remote repositories that are referenced by protobuf packages.
 `POST` operations may take a while if they rely on large repositories for imported definitions that are not yet cached.
 You can enforce a cache of certain repsitories by setting `PROTO_REGISTRY_PRE_CACHED_REMOTES` in the environment.
-For example, `PROTO_REGISTRY_PRE_CACHED_REMOTES="github.com/googleapis/googleapis"`.
+For example, `PROTO_REGISTRY_PRE_CACHED_REMOTES="github.com/googleapis/api-common-protos"`.
 
 ### Configuration
 
@@ -81,6 +108,7 @@ Options are limited right now, but it is setup in a way to easily add new interf
 |`PROTO_REGISTRY_WRITE_TIMEOUT`     | `15`                      |Write timeout for API/UI `HTTP` requests.                                         |
 |`PROTO_REGISTRY_COMPILE_TIMEOUT`   | `10`                      |Timeout for `protoc` invocations.                                                 |
 |`PROTO_REGISTRY_PROTOC_PATH`       | `/usr/bin/protoc`         |Path to the `protoc` executable. Leave unchanged in docker image.                 |
+|`PROTO_REGISTRY_PROTOC_GEN_GO_PATH`|`/opt/proto-registry/bin/protoc-gen-go` |The path to a compiled `protoc-gen-go` plugin until I can get gocode generation to work independently via its exported interfaces|
 |`PROTO_REGISTRY_DATABASE_DRIVER`   | `memory`                  |Driver to use for database operations, only `memory` currently.                   |
 |`PROTO_REGISTRY_STORAGE_DRIVER`    | `file`                    |Driver to use for file storage operations, only `file` currently.                 |
 |`PROTO_REGISTRY_FILE_STORAGE_PATH` | `/opt/proto-registry/data`|Path to file storage when using file storage driver.                              |
@@ -98,7 +126,6 @@ Coming soon
 #### TODO
 
  - [ ] dont use protoc for descriptor sets
- - [ ] gocode support
  - [ ] unit tests
  - [ ] dev docs
  - [ ] validateOnly/linting on `POST /api/proto`

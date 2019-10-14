@@ -2,7 +2,7 @@
 syntax = "proto2";
 
 package com.example;
-option go_package = "example.com/proto/example";
+option go_package = "registry.localhost/golang/test-protobuf";
 
 /**
  * Represents a manufacturer of cars.

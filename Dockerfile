@@ -55,7 +55,7 @@ RUN cd ui && npm run build
 FROM alpine
 
 # Add protobuf utilities
-RUN apk add --update protobuf protobuf-dev
+RUN apk add --update protobuf protobuf-dev git
 
 # setup a user and data directories
 RUN adduser -u 1000 -h /opt/proto-registry -s /bin/false -D protoregistry

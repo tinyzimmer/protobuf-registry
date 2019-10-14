@@ -14,22 +14,25 @@ random-version() {
 }
 
 zip-proto() {
-  cd hack/test_protobuf && zip -r proto.zip * && cd ../..
+  cd test_protobuf && zip -r proto.zip * && cd ..
 }
 
 clean() {
-  rm hack/test_protobuf/proto.zip
+  rm ./test_protobuf/proto.zip
 }
 
 post-test-data() {
   if [[ -z "${NUM}" ]] ; then
     NUM=10
   fi
-  b64data=$(cat hack/test_protobuf/proto.zip | base64 --wrap=0)
+  if [[ -z "${REGISTRY_HOST}" ]] ; then
+    REGISTRY_HOST="localhost:8080"
+  fi
+  b64data=$(cat ./test_protobuf/proto.zip | base64 --wrap=0)
   messagenames=($(shuf -n ${NUM}  /usr/share/dict/words | sed "s/'//g" | tr '[:upper:]' '[:lower:]'))
   for msg in "${messagenames[@]}" ; do
     curl \
-      -X POST localhost:8080/api/proto \
+      -X POST ${REGISTRY_HOST}/api/proto \
       --data "
         {
           \"version\": \"$(random-version)\",
@@ -44,4 +47,6 @@ post-test-data() {
   done
 }
 
-main
+if [[ "${0}" == "add_test_data.sh" ]] ; then
+  main
+fi

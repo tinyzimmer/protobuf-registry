@@ -7,7 +7,7 @@
 
 syntax = "proto3";
 
-option go_package = "example.com/proto/example";
+option go_package = "registry.localhost/golang/test-protobuf";
 option java_package = "com.example.test.data";
 option java_outer_classname = "TestDataProtos";
 
