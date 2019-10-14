@@ -40,7 +40,7 @@ test: fmt vet
 coverage: test
 	go get golang.org/x/tools/cmd/cover
 	go get github.com/mattn/goveralls
-	goveralls -coverprofile=cover.out -service=github-actions -repotoken ${COVERALLS_TOKEN} ./pkg/...
+	$(shell go env GOPATH)/bin/goveralls -coverprofile=cover.out -service=github-actions -repotoken ${COVERALLS_TOKEN} ./pkg/...
 
 ui/node_modules:
 	cd ui && npm install
