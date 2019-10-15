@@ -26,6 +26,7 @@ import (
 
 func TestCompileDescriptorSet(t *testing.T) {
 	proto := newTestProtoWithData(t)
+	os.Setenv("IGNORE_PROTOC", "true")
 	_ = config.Init()
 	config.GlobalConfig.ProtocPath = "echo"
 	if err := proto.CompileDescriptorSet(); !os.IsNotExist(err) {
@@ -39,4 +40,5 @@ func TestCompileDescriptorSet(t *testing.T) {
 	if err := proto.CompileDescriptorSet(); err == nil {
 		t.Error("Expected error from no data, got nil")
 	}
+	os.Unsetenv("IGNORE_PROTOC")
 }
