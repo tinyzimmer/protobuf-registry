@@ -49,12 +49,12 @@ func UnmarshallInto(body io.Reader, obj interface{}) error {
 }
 
 func BadRequest(err error, w http.ResponseWriter) {
-	res := &serverError{ErrMsg: fmt.Sprintf("Bad request: %s", err.Error())}
+	res := &ServerError{ErrMsg: fmt.Sprintf("Bad request: %s", err.Error())}
 	http.Error(w, res.JSON(), http.StatusBadRequest)
 }
 
 func NotFound(err error, w http.ResponseWriter) {
-	res := &serverError{ErrMsg: fmt.Sprintf("Not Found: %s", err.Error())}
+	res := &ServerError{ErrMsg: fmt.Sprintf("Not Found: %s", err.Error())}
 	http.Error(w, res.JSON(), http.StatusNotFound)
 }
 

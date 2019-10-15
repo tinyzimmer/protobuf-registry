@@ -29,7 +29,7 @@ import (
 func (m *memoryDatabase) dumpToDisk() error {
 	var buf bytes.Buffer
 	gzw := gzip.NewWriter(&buf)
-	out, err := json.Marshal(m.protoBufs)
+	out, err := json.Marshal(m.protobufs)
 	if err != nil {
 		return err
 	}
@@ -53,17 +53,17 @@ func (m *memoryDatabase) loadFromDisk() error {
 	if err != nil {
 		return err
 	}
-	if err := json.Unmarshal(raw, &m.protoBufs); err != nil {
+	if err := json.Unmarshal(raw, &m.protobufs); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (m *memoryDatabase) addProtobuf(proto *protobuf.Protobuf) {
-	if _, ok := m.protoBufs[*proto.Name]; !ok {
-		m.protoBufs[*proto.Name] = []*protobuf.Protobuf{proto}
+	if _, ok := m.protobufs[*proto.Name]; !ok {
+		m.protobufs[*proto.Name] = []*protobuf.Protobuf{proto}
 	} else {
-		m.protoBufs[*proto.Name] = append(m.protoBufs[*proto.Name], proto)
+		m.protobufs[*proto.Name] = append(m.protobufs[*proto.Name], proto)
 	}
 }
 

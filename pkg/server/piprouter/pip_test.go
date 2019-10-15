@@ -15,19 +15,4 @@
 // You should have received a copy of the GNU General Public License
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
-package common
-
-import "encoding/json"
-
-type ServerError struct {
-	ErrMsg string `json:"error"`
-}
-
-func (e *ServerError) Error() string {
-	return e.ErrMsg
-}
-
-func (e *ServerError) JSON() string {
-	out, _ := json.MarshalIndent(e, "", "  ")
-	return string(out)
-}
+package piprouter

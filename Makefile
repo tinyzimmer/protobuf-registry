@@ -22,7 +22,7 @@ license-check:
 
 .PHONY: lint
 lint: bin/golangci-lint ## Run linter
-	@bin/golangci-lint run -v
+	@bin/golangci-lint run -v --skip-dirs pkg/util/client
 
 # Run go fmt against code
 fmt:
@@ -66,8 +66,7 @@ run_persistent: build
 		--rm \
 		-p 8080:8080 \
 		-v "`pwd`/data:/opt/proto-registry/data" \
-		-e PROTO_REGISTRY_PERSIST_MEMORY=true \
-		${IMG}
+		${IMG} --persist-memory
 
 test_data:
 	cd hack && NUM=${NUM} REGISTRY_HOST=${REGISTRY_HOST} bash add_test_data.sh

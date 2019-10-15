@@ -35,20 +35,20 @@ var defaults = map[string]interface{}{
 	"FileStoragePath":      "/opt/proto-registry/data",
 	"PersistMemoryToDisk":  false,
 	"PreCachedRemotes":     []string{},
-	"RedirectNotFoundToUI": true,
+	"RedirectNotFoundToUI": false,
 	"CORSEnabled":          false,
 }
 
 func TestInit(t *testing.T) {
-	os.Setenv("PROTO_REGISTRY_PROTOC_PATH", "/not/exists")
+	os.Setenv("PROTOC_PATH", "/not/exists")
 	if err := Init(); err == nil {
 		t.Error("Expected error no protoc, got nil")
 	}
-	os.Setenv("PROTO_REGISTRY_IGNORE_PROTOC", "true")
+	os.Setenv("IGNORE_PROTOC", "true")
 	if err := Init(); err != nil {
 		t.Error("Expected to ignore protoc, got:", err)
 	}
-	os.Unsetenv("PROTO_REGISTRY_PROTOC_PATH")
+	os.Unsetenv("PROTOC_PATH")
 
 	jsonbytes := GlobalConfig.JSON()
 	if len(jsonbytes) == 0 {
@@ -57,16 +57,8 @@ func TestInit(t *testing.T) {
 
 }
 
-func TestBadConfig(t *testing.T) {
-	os.Setenv("PROTO_REGISTRY_WRITE_TIMEOUT", "notint")
-	if _, err := newConfig(); err == nil {
-		t.Error("Expected error got nil")
-	}
-	os.Unsetenv("PROTO_REGISTRY_WRITE_TIMEOUT")
-}
-
 func TestDefaults(t *testing.T) {
-	os.Setenv("PROTO_REGISTRY_IGNORE_PROTOC", "true")
+	os.Setenv("IGNORE_PROTOC", "true")
 	c, err := newConfig()
 	if err != nil {
 		t.Error("Expected no error on new config, got:", err)

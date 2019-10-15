@@ -15,19 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
-package common
+package protobuf
 
-import "encoding/json"
+import (
+	"os"
+	"testing"
 
-type ServerError struct {
-	ErrMsg string `json:"error"`
-}
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+)
 
-func (e *ServerError) Error() string {
-	return e.ErrMsg
-}
-
-func (e *ServerError) JSON() string {
-	out, _ := json.MarshalIndent(e, "", "  ")
-	return string(out)
+func TestCompileDescriptorSet(t *testing.T) {
+	proto := newTestProtoWithData(t)
+	_ = config.Init()
+	config.GlobalConfig.ProtocPath = "echo"
+	if err := proto.CompileDescriptorSet(); !os.IsNotExist(err) {
+		t.Error("Expected only error from final read attempt got:", err)
+	}
+	config.GlobalConfig.ProtocPath = "bad-non-exist"
+	if err := proto.CompileDescriptorSet(); err == nil {
+		t.Error("Expected error from bad executable, got nil")
+	}
+	proto.SetRaw(nil)
+	if err := proto.CompileDescriptorSet(); err == nil {
+		t.Error("Expected error from no data, got nil")
+	}
 }

@@ -88,35 +88,37 @@ To enable persistence run with the following flags:
 $> docker run \
     -p 8080:8080 \
     -v "`pwd`/data:/data" \
-    -e PROTO_REGISTRY_PERSIST_MEMORY=true \
+    -e PERSIST_MEMORY=true \
     tinyzimmer/protobuf-registry
 ```
 
 The data directory will also hold the cache of remote repositories that are referenced by protobuf packages.
 `POST` operations may take a while if they rely on large repositories for imported definitions that are not yet cached.
-You can enforce a cache of certain repsitories by setting `PROTO_REGISTRY_PRE_CACHED_REMOTES` in the environment.
-For example, `PROTO_REGISTRY_PRE_CACHED_REMOTES="github.com/googleapis/api-common-protos"`.
+You can enforce a cache of certain repsitories by setting `PRE_CACHED_REMOTES` in the environment.
+For example, `PRE_CACHED_REMOTES="github.com/googleapis/api-common-protos"`.
 
 ### Configuration
 
-The image can be configured via environment variables.
+The image can be configured via environment variables or on the command-line.
 Options are limited right now, but it is setup in a way to easily add new interfaces for different backends.
 
-| Name                              | Default                   |Description                                                                       |
-|:---------------------------------:|:-------------------------:|:---------------------------------------------------------------------------------|
-|`PROTO_REGISTRY_BIND_ADDRESS`      |`0.0.0.0:8080`             |The address and port to bind to.                                                  |
-|`PROTO_REGISTRY_READ_TIMEOUT`      | `15`                      |Read timeout for API/UI `HTTP` requests.                                          |
-|`PROTO_REGISTRY_WRITE_TIMEOUT`     | `15`                      |Write timeout for API/UI `HTTP` requests.                                         |
-|`PROTO_REGISTRY_COMPILE_TIMEOUT`   | `10`                      |Timeout for `protoc` invocations.                                                 |
-|`PROTO_REGISTRY_PROTOC_PATH`       | `/usr/bin/protoc`         |Path to the `protoc` executable. Leave unchanged in docker image.                 |
-|`PROTO_REGISTRY_PROTOC_GEN_GO_PATH`|`/opt/proto-registry/bin/protoc-gen-go` |The path to a compiled `protoc-gen-go` plugin until I can get gocode generation to work independently via its exported interfaces|
-|`PROTO_REGISTRY_DATABASE_DRIVER`   | `memory`                  |Driver to use for database operations, only `memory` currently.                   |
-|`PROTO_REGISTRY_STORAGE_DRIVER`    | `file`                    |Driver to use for file storage operations, only `file` currently.                 |
-|`PROTO_REGISTRY_FILE_STORAGE_PATH` | `/opt/proto-registry/data`|Path to file storage when using file storage driver.                              |
-|`PROTO_REGISTRY_PERSIST_MEMORY`    | `false`                   |Persist the in-memory database to disk after write operations.                    |
-|`PROTO_REGISTRY_PRE_CACHED_REMOTES`| `[]`                      |A comma-separated list of remote git repositories to pre-cache for compilations.  |
-|`PROTO_REGISTRY_UI_REDIRECT_ALL`   | `true`                    |Redirect all unknown routes to the UI. Useful to turn off for discovery debugging.|
-|`PROTO_REGISTRY_ENABLE_CORS`       | `false`                   |Enable CORS headers for API requests.                                             |
+| Name                              | Default                   |Description                                                        |
+|:---------------------------------:|:-------------------------:|:------------------------------------------------------------------|
+|`BIND_ADDRESS`      |`0.0.0.0:8080`             |The address and port to bind to.                                                  |
+|`READ_TIMEOUT`      | `15`                      |Read timeout for API/UI `HTTP` requests.                                          |
+|`WRITE_TIMEOUT`     | `15`                      |Write timeout for API/UI `HTTP` requests.                                         |
+|`COMPILE_TIMEOUT`   | `10`                      |Timeout for `protoc` invocations.                                                 |
+|`PROTOC_PATH`       | `/usr/bin/protoc`         |Path to the `protoc` executable. Leave unchanged in docker image.                 |
+|`PROTOC_GEN_GO_PATH`|`/opt/proto-registry/bin/protoc-gen-go` |The path to a compiled `protoc-gen-go` plugin until I can get gocode generation to work independently via its exported interfaces|
+|`DATABASE_DRIVER`   | `memory`                  |Driver to use for database operations, only `memory` currently.                   |
+|`STORAGE_DRIVER`    | `file`                    |Driver to use for file storage operations, only `file` currently.                 |
+|`FILE_STORAGE_PATH` | `/opt/proto-registry/data`|Path to file storage when using file storage driver.                              |
+|`PERSIST_MEMORY`    | `false`                   |Persist the in-memory database to disk after write operations.                    |
+|`PRE_CACHED_REMOTES`| `[]`                      |A comma-separated list of remote git repositories to pre-cache for compilations.  |
+|`UI_REDIRECT_ALL`   | `false`                   |Redirect all unknown routes to the UI. Useful to turn off for discovery debugging.|
+|`ENABLE_CORS`       | `false`                   |Enable CORS headers for API requests.                                             |
+
+The CLI equivalents line up to the environment variables (just as lowercase) for the most part. You can pass `--help` to the app or docker container to see all the options:
 
 ## Development
 

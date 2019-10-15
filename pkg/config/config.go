@@ -19,19 +19,19 @@ package config
 
 import (
 	"encoding/json"
+	"flag"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 
-	"github.com/kelseyhightower/envconfig"
-)
-
-const (
-	envPrefix = "proto_registry"
+	"github.com/go-logr/glogr"
+	"github.com/jessevdk/go-flags"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
 var GlobalConfig *Config
+var log = glogr.New()
 
 func Init() error {
 	var err error
@@ -43,62 +43,82 @@ func Init() error {
 
 type Config struct {
 	// Server Settings
-	BindAddress  string `envconfig:"bind_address" default:"0.0.0.0:8080" json:"bind_address"`
-	ReadTimeout  int    `envconfig:"read_timeout" default:"15" json:"read_timeout"`
-	WriteTimeout int    `envconfig:"write_timeout" default:"15" json:"write_timeout"`
+	BindAddress  string `long:"bind-address" env:"BIND_ADDRESS" default:"0.0.0.0:8080" json:"bind_address" description:"The address and port for the server to listen on"`
+	ReadTimeout  int    `long:"read-timeout" env:"READ_TIMEOUT" default:"15" json:"read_timeout" description:"The read timeout in seconds for web requests"`
+	WriteTimeout int    `long:"write-timeout" env:"WRITE_TIMEOUT" default:"15" json:"write_timeout" description:"The write timeout in seconds for web requests"`
 
 	// Protobuf Compilation Settings
-	CompileTimeout  int    `envconfig:"compile_timeout" default:"10" json:"compile_timeout"`
-	ProtocPath      string `envconfig:"protoc_path" default:"/usr/bin/protoc" json:"protoc_path"`
-	ProtocGenGoPath string `envconfig:"protoc_gen_go_path" default:"/opt/proto-registry/bin/protoc-gen-go" json:"protoc_gen_go_path"`
+	CompileTimeout  int    `long:"compile-timeout" env:"COMPILE_TIMEOUT" default:"10" json:"compile_timeout" description:"The timeout in seconds for protoc operations"`
+	ProtocPath      string `long:"protoc-path" env:"PROTOC_PATH" default:"/usr/bin/protoc" json:"protoc_path" description:"The path to the protoc executable"`
+	ProtocGenGoPath string `long:"protoc-gen-go-path" env:"PROTOC_GEN_GO_PATH" default:"/opt/proto-registry/bin/protoc-gen-go" json:"protoc_gen_go_path" description:"The path to the protoc-gen-go plugin"`
 	// Database Settings
-	DatabaseDriver string `envconfig:"database_driver" default:"memory" json:"database_driver"`
+	DatabaseDriver string `long:"database-driver" env:"DATABASE_DRIVER" default:"memory" json:"database_driver" description:"The database driver to use"`
 
 	// Storage Settings
-	StorageDriver string `envconfig:"storage_driver" default:"file" json:"storage_driver"`
+	StorageDriver string `long:"storage-driver" env:"STORAGE_DRIVER" default:"file" json:"storage_driver" description:"The storage driver to use"`
 
 	// File Storage settings
-	FileStoragePath string `envconfig:"file_storage_path" default:"/opt/proto-registry/data" json:"file_storage_path"`
+	FileStoragePath string `long:"file-storage-path" env:"FILE_STORAGE_PATH" default:"/opt/proto-registry/data" json:"file_storage_path" description:"The filepath used by the file storage driver and remote cache"`
 
 	// Memory database settings
-	PersistMemoryToDisk bool `envconfig:"persist_memory" default:"false" json:"persist_memory"`
+	PersistMemoryToDisk bool `long:"persist-memory" env:"PERSIST_MEMORY" json:"persist_memory" description:"Whether to persist the memory database to disk after write/delete operations"`
 
 	// Pre-populate cache with remote dependencies
-	PreCachedRemotes []string `envconfig:"pre_cached_remotes" json:"pre_cached_remotes"`
+	PreCachedRemotes []string `long:"pre-cached-remotes" env-delim:"," env:"PRE_CACHED_REMOTES" json:"pre_cached_remotes" description:"Remote repositories to pre-cache as protoc imports"`
 
 	// UI Settings
-	RedirectNotFoundToUI bool `envconfig:"ui_redirect_all" default:"true" json:"ui_redirect_all"`
-	CORSEnabled          bool `envconfig:"enable_cors" default:"false" json:"cors_enabled"`
+	RedirectNotFoundToUI bool `long:"ui-redirect-all" env:"UI_REDIRECT_ALL" json:"ui_redirect_all" description:"Redirect all unhandled requests to the UI instead of the default 404 handler"`
+	CORSEnabled          bool `long:"enable-cors" env:"ENABLE_CORS" json:"cors_enabled" description:"Enable CORS headers for requests"`
 
 	// protobuf version as detected at boot
-	ProtobufVersion string `ignored:"true" json:"protobuf_version"`
+	ProtobufVersion string `no-flag:"" json:"protobuf_version"`
 
-	// Compile environment
-	GoVersion   string `ignored:"true" json:"go_version"`
-	GitCommit   string `ignored:"true" json:"git_commit"`
-	CompileDate string `ignored:"true" json:"compile_date"`
+	// Compile environment - add a short t to trick unit test parsing
+	GoVersion   string `hidden:"true" short:"t" json:"go_version"`
+	GitCommit   string `hidden:"true" json:"git_commit"`
+	CompileDate string `hidden:"true" json:"compile_date"`
 }
 
+// JSON returns the json bytes for the config object
 func (c *Config) JSON() []byte {
 	out, _ := json.MarshalIndent(c, "", "  ")
 	return append(out, "\n"...)
 }
 
+// newConfig parses the environment and cli flags for both go-flags and glogr
 func newConfig() (*Config, error) {
 	c := &Config{}
-	err := envconfig.Process(envPrefix, c)
-	if err != nil {
+	parser := flags.NewParser(c, flags.Default|flags.PassAfterNonOption)
+	if _, err := parser.Parse(); err != nil {
 		return nil, err
 	}
 	out, err := exec.Command(c.ProtocPath, "--version").CombinedOutput()
 	if err != nil && !ignoreNoProtoc() {
+		// hack for --help somehow getting set over the default protoc path
+		if !util.StringSliceContains(os.Args, "--help") {
+			log.Error(err, "No protoc at the provided path")
+		}
 		return nil, err
 	}
 	c.ProtobufVersion = strings.TrimSpace(string(out))
 	c.GoVersion = runtime.Version()
+	// handle flags for logging
+	handleLogFlags()
 	return c, nil
 }
 
+// ignoreNoProtoc indicates that protoc not being present should be ignored -
+// used primarily for testing
 func ignoreNoProtoc() bool {
-	return strings.ToLower(os.Getenv("PROTO_REGISTRY_IGNORE_PROTOC")) == "true"
+	return strings.ToLower(os.Getenv("IGNORE_PROTOC")) == "true"
+}
+
+// handleLogFlags wipes out previous flags so we can just configure glogr -
+// yes this is rather hacky to just be able to use a logging library
+func handleLogFlags() {
+	os.Args = []string{os.Args[0]}
+	if err := flag.Set("alsologtostderr", "true"); err != nil {
+		panic(err)
+	}
+	flag.Parse()
 }

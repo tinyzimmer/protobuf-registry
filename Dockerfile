@@ -72,4 +72,4 @@ COPY --from=apibuilder /workspace/go/bin/protoc-gen-go  /opt/proto-registry/bin/
 # Copy UI assets
 COPY --from=uibuilder /workspace/ui/build /opt/proto-registry/static
 
-CMD ["/opt/proto-registry/app"]
+ENTRYPOINT ["/opt/proto-registry/app"]

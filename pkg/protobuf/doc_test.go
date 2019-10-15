@@ -15,19 +15,33 @@
 // You should have received a copy of the GNU General Public License
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
-package common
+package protobuf
 
-import "encoding/json"
+import (
+	"testing"
 
-type ServerError struct {
-	ErrMsg string `json:"error"`
-}
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+)
 
-func (e *ServerError) Error() string {
-	return e.ErrMsg
-}
+func TestDocJSON(t *testing.T) {
+	proto := newTestProtoWithData(t)
+	_ = config.Init()
+	config.GlobalConfig.ProtobufVersion = "3.6.1"
+	out, err := proto.DocJSON("TestProtoMessage.proto")
+	if err != nil {
+		t.Fatal("Expected no error, got:", err)
+	}
+	if out == nil {
+		t.Error("Expected JSON response, got nil")
+	}
 
-func (e *ServerError) JSON() string {
-	out, _ := json.MarshalIndent(e, "", "  ")
-	return string(out)
+	_, err = proto.DocJSON("non-exist")
+	if err == nil {
+		t.Error("Expected error for non-exist file, got nil")
+	}
+
+	proto.SetDescriptor(nil)
+	if _, err = proto.DocJSON("TestProtoMessage.proto"); err == nil {
+		t.Error("Expected error from no descriptor set, got nil")
+	}
 }

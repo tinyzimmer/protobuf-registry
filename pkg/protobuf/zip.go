@@ -28,6 +28,7 @@ import (
 	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
+// rawZipFiles returns raw zip readers for the zip data
 func (p *Protobuf) rawZipFiles() ([]*zip.File, error) {
 	if p.Raw() == nil {
 		return nil, errors.New("raw zip is nil, need to call p.SetRaw() or p.SetRawFromBase64()")
@@ -40,6 +41,8 @@ func (p *Protobuf) rawZipFiles() ([]*zip.File, error) {
 	return reader.File, nil
 }
 
+// newTempFilesFromRaw writes the raw files, and optionally descriptor set, and returns
+// the path to the files and a map of directories to their children attributes
 func (p *Protobuf) newTempFilesFromRaw(withDescriptor bool) (rootPath, descriptorPath string, filesInfo map[string][]os.FileInfo, err error) {
 	if withDescriptor {
 		if p.DescriptorBytes() == nil {

@@ -37,3 +37,21 @@ func RandomString(length int) string {
 func StringPtr(str string) *string {
 	return &str
 }
+
+func StringSliceContains(sl []string, s string) bool {
+	for _, x := range sl {
+		if x == s {
+			return true
+		}
+	}
+	return false
+}
+
+func StringPtrSliceContains(sl []*string, s *string) bool {
+	for _, x := range sl {
+		if *x == *s {
+			return true
+		}
+	}
+	return false
+}

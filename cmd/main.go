@@ -19,7 +19,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"os"
 	"os/signal"
 	"syscall"
@@ -37,14 +36,9 @@ var log = glogr.New()
 var catchSignals = []os.Signal{syscall.SIGINT, syscall.SIGTERM}
 
 func main() {
-	// handle flags for logging
-	if err := flag.Set("alsologtostderr", "true"); err != nil {
-		panic(err)
-	}
-	flag.Parse()
 
 	if err := config.Init(); err != nil {
-		panic(err)
+		os.Exit(1)
 	}
 
 	setupLog := log.WithName("setup")

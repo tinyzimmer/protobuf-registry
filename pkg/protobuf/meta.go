@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"github.com/jhump/protoreflect/desc"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
 func appendPkgsFromDescriptor(p *ProtobufDescriptors, f *desc.FileDescriptor) (o *ProtobufDescriptors) {
@@ -33,12 +34,12 @@ func appendPkgsFromDescriptor(p *ProtobufDescriptors, f *desc.FileDescriptor) (o
 		return p
 	}
 	if opts.JavaPackage != nil {
-		if !contains(p.JavaPackages, opts.JavaPackage) {
+		if !util.StringPtrSliceContains(p.JavaPackages, opts.JavaPackage) {
 			p.JavaPackages = append(p.JavaPackages, opts.JavaPackage)
 		}
 	}
 	if opts.GoPackage != nil {
-		if !contains(p.GoPackages, opts.GoPackage) {
+		if !util.StringPtrSliceContains(p.GoPackages, opts.GoPackage) {
 			p.GoPackages = append(p.GoPackages, opts.GoPackage)
 		}
 	}
@@ -102,13 +103,4 @@ func getFilePathFromZipFiles(tempPath string, filesInfo map[string][]os.FileInfo
 		err = fmt.Errorf("No file %s in this protobuf package", filename)
 	}
 	return file, err
-}
-
-func contains(slice []*string, s *string) bool {
-	for _, x := range slice {
-		if *x == *s {
-			return true
-		}
-	}
-	return false
 }

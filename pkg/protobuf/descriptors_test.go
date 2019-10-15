@@ -15,19 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
-package common
+package protobuf
 
-import "encoding/json"
+import "testing"
 
-type ServerError struct {
-	ErrMsg string `json:"error"`
-}
-
-func (e *ServerError) Error() string {
-	return e.ErrMsg
-}
-
-func (e *ServerError) JSON() string {
-	out, _ := json.MarshalIndent(e, "", "  ")
-	return string(out)
+func TestDescriptors(t *testing.T) {
+	proto := newTestProtoWithData(t)
+	if _, err := proto.Descriptors(); err != nil {
+		t.Error("Expected to get descriptors for valid data, got error:", err)
+	}
+	proto.SetDescriptor(nil)
+	if _, err := proto.Descriptors(); err == nil {
+		t.Error("Expected error for no data, got nil")
+	}
+	proto.SetDescriptor([]byte("some invalid data"))
+	if _, err := proto.Descriptors(); err == nil {
+		t.Error("Expected error from invalid data, got nil")
+	}
 }

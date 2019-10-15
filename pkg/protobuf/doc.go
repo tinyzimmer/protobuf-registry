@@ -27,6 +27,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 	docgen "github.com/pseudomuto/protoc-gen-doc"
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
 func (p *Protobuf) DocJSON(filename string) ([]byte, error) {
@@ -53,7 +54,7 @@ func generateDocs(desc *desc.FileDescriptor, descriptors map[string]*desc.FileDe
 		FileToGenerate:  []string{desc.GetName()},
 		ProtoFile:       toFileDescriptorProtos(descriptors),
 		CompilerVersion: parseProtocVersion(),
-		Parameter:       strPtr("json,docs.json"),
+		Parameter:       util.StringPtr("json,docs.json"),
 	}
 	res, err := plugin.Generate(req)
 	if err != nil {
@@ -70,10 +71,6 @@ func intPtr(s string) *int32 {
 	i, _ := strconv.Atoi(s)
 	i32 := int32(i)
 	return &i32
-}
-
-func strPtr(s string) *string {
-	return &s
 }
 
 func parseProtocVersion() *docreq.Version {

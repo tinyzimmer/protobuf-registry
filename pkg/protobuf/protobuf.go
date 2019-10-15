@@ -32,6 +32,9 @@ import (
 
 var log = glogr.New()
 
+// Protobuf represents a single versioned protobuf package. It implements methods
+// for utility functions across different packages. Storage and Database providers
+// are responsible for setting, storing, and retrieving the raw data.
 type Protobuf struct {
 	ID           *string                  `json:"id"`
 	Name         *string                  `json:"name"`
@@ -40,10 +43,11 @@ type Protobuf struct {
 	Dependencies []*types.ProtoDependency `json:"dependencies"`
 	// raw zip bytes
 	raw []byte
-	// raw descriptor bytes
+	// raw descriptor set bytes
 	descriptor []byte
 }
 
+// NewFromRequest converts a PostProtoRequest to a bare protobuf object
 func NewFromRequest(req *types.PostProtoRequest) *Protobuf {
 	return &Protobuf{
 		ID:           &req.ID,
@@ -53,6 +57,7 @@ func NewFromRequest(req *types.PostProtoRequest) *Protobuf {
 	}
 }
 
+// SetRawFromBase64 sets the raw protobuf data from a base64 string
 func (p *Protobuf) SetRawFromBase64(body string) error {
 	var raw []byte
 	var err error
@@ -63,34 +68,42 @@ func (p *Protobuf) SetRawFromBase64(body string) error {
 	return nil
 }
 
+// SetRaw sets the raw protobuf data from a byte slice
 func (p *Protobuf) SetRaw(raw []byte) {
 	p.raw = raw
 }
 
+// SetDescritptor sets the raw descriptor set from a byte slice
 func (p *Protobuf) SetDescriptor(raw []byte) {
 	p.descriptor = raw
 }
 
+// Raw returns the raw zip bytes of the protobuf object
 func (p *Protobuf) Raw() []byte {
 	return p.raw
 }
 
+// DescriptorBytes returns the descriptor set bytes for the protobuf object
 func (p *Protobuf) DescriptorBytes() []byte {
 	return p.descriptor
 }
 
+// RawFilename returns a zip filename for the protobuf object
 func (p *Protobuf) RawFilename() string {
 	return fmt.Sprintf("%s-%s.zip", *p.Name, *p.Version)
 }
 
+// RawReader returns a ReadSeeker for the raw zip data - useful for serving in http requests
 func (p *Protobuf) RawReader() io.ReadSeeker {
 	return bytes.NewReader(p.raw)
 }
 
+// DescriptorReader returns a ReadSeeker for the raw desciptor set
 func (p *Protobuf) DescriptorReader() io.ReadSeeker {
 	return bytes.NewReader(p.descriptor)
 }
 
+// SHA256 computes the sha256zum for the protobuf zip contents
 func (p *Protobuf) SHA256() (string, error) {
 	if p.Raw() == nil {
 		return "", errors.New("raw zip is nil, need to call p.SetRaw() or p.SetRawFromBase64()")
