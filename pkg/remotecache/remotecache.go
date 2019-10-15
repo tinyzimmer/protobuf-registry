@@ -37,6 +37,9 @@ var log = glogr.New()
 func InitCache() error {
 	log.Info("Initializing remote dependency cache, POST operations using remote dependencies will hang until this completes")
 	cache = newCache()
+	if err := os.MkdirAll(cache.cacheRoot, 0700); err != nil {
+		return err
+	}
 	for _, x := range config.GlobalConfig.PreCachedRemotes {
 		log.Info(fmt.Sprintf("Updating remote dependency cache for: %s", x))
 		if _, err := cache.GetGitDependency(&types.ProtoDependency{
