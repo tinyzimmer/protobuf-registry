@@ -16,3 +16,32 @@
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
 package rubyutil
+
+import (
+	"testing"
+
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util"
+)
+
+func TestRubyGemsList(t *testing.T) {
+	pkgs := []*protobuf.Protobuf{
+		{Name: util.StringPtr("test-proto"), Version: util.StringPtr("0.0.1")},
+	}
+
+	out, err := NewRubyGemsListFromPackages(pkgs)
+	if err != nil {
+		t.Error("Expected no error, got:", err)
+	}
+	if len(out) == 0 {
+		t.Error("Expected output, got nil")
+	}
+
+	out, err = NewGemSpecFromPackage(pkgs[0])
+	if err != nil {
+		t.Error("Expected no error, got:", err)
+	}
+	if len(out) == 0 {
+		t.Error("Expected output, got nil")
+	}
+}
