@@ -18,6 +18,7 @@
 package file
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -45,7 +46,10 @@ func (f *fileProvider) mkdirAll(path string) error {
 }
 
 func (f *fileProvider) writeRawToDisk(path string, data []byte) error {
-	log.Info("Writing data to local directory", "path", path)
+	if data == nil {
+		return errors.New("data cannot be nil")
+	}
+	log.Info("Writing data to local filesystem", "path", path)
 	if err := f.mkdirAll(filepath.Dir(path)); err != nil {
 		return err
 	}

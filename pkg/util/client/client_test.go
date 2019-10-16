@@ -16,3 +16,23 @@
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
 package client
+
+import "testing"
+
+// Placeholder tests for coverage
+
+func TestClient(t *testing.T) {
+	client := New("test-url")
+	client.GetServerConfig()
+	client.UploadProtoPackage(nil, false)
+	client.UploadProtoPackageFromDir("", false)
+	client.GetProtoPackageVersions("test")
+	client.DeleteAllProtoPackageVersions("test")
+	client.GetProtoPackage("test", "0.0.1")
+	client.DeleteProtoPackage("test", "0.0.1")
+	client.DownloadProtoPackage("test", "0.0.1", "raw")
+	client.GetFileContents("test", "0.0.1", "testmessage.proto")
+	client.GetFileDocs("test", "0.0.1", "testmessage.proto")
+	client.GetCachedRemotes()
+	client.PutCachedRemote("test-remote")
+}

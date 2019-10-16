@@ -33,13 +33,15 @@ const descriptorFileName = "descriptors.pb"
 
 var log = glogr.New()
 
+var _ common.Provider = &fileProvider{}
+
 type fileProvider struct {
 	common.Provider
 
 	conf *config.Config
 }
 
-func NewProvider(conf *config.Config) common.Provider {
+func NewProvider(conf *config.Config) *fileProvider {
 	return &fileProvider{conf: conf}
 }
 

@@ -16,3 +16,25 @@
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
 package storage
+
+import (
+	"reflect"
+	"testing"
+
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+)
+
+func TestGetProvider(t *testing.T) {
+	config.SafeInit()
+
+	provider := GetProvider(config.GlobalConfig)
+	if reflect.TypeOf(provider).String() != "*file.fileProvider" {
+		t.Error("Expected to get file provider back, got:", reflect.TypeOf(provider).String())
+	}
+
+	config.GlobalConfig.StorageDriver = "default"
+	provider = GetProvider(config.GlobalConfig)
+	if reflect.TypeOf(provider).String() != "*file.fileProvider" {
+		t.Error("Expected to get file provider back, got:", reflect.TypeOf(provider).String())
+	}
+}
