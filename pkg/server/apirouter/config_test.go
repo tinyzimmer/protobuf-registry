@@ -15,30 +15,35 @@
 // You should have received a copy of the GNU General Public License
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
-package protobuf
+package apirouter
 
 import (
-	"os"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 )
 
-func TestCompileDescriptorSet(t *testing.T) {
-	proto := newTestProtoWithData(t)
-	os.Setenv("IGNORE_PROTOC", "true")
-	_ = config.Init()
-	config.GlobalConfig.ProtocPath = "echo"
-	if err := proto.CompileDescriptorSet(); err != nil {
-		t.Error("Expected no error got:", err)
+func TestGetConfigHandler(t *testing.T) {
+	srvr, rm := getServer(t)
+	defer rm()
+	rr := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/api/config", nil)
+	if err != nil {
+		t.Fatal(err)
 	}
-	config.GlobalConfig.ProtocPath = "bad-non-exist"
-	if err := proto.CompileDescriptorSet(); err == nil {
-		t.Error("Expected error from bad executable, got nil")
+
+	srvr.router.ServeHTTP(rr, req)
+
+	var conf config.Config
+	err = json.Unmarshal(rr.Body.Bytes(), &conf)
+	if err != nil {
+		t.Error("Did not get valid JSON back")
 	}
-	proto.SetRaw(nil)
-	if err := proto.CompileDescriptorSet(); err == nil {
-		t.Error("Expected error from no data, got nil")
+	if !reflect.DeepEqual(conf, *config.GlobalConfig) {
+		t.Error("Config was malformed in response")
 	}
-	os.Unsetenv("IGNORE_PROTOC")
 }

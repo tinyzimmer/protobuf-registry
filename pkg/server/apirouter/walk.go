@@ -28,17 +28,17 @@ type WalkResponse struct {
 	Routes []*Route `json:"routes"`
 }
 
-func newWalkResponse() *WalkResponse {
-	return &WalkResponse{
-		Routes: make([]*Route, 0),
-	}
-}
-
 type Route struct {
 	Path        string `json:"path"`
 	PathRegexp  string `json:"pathRegex"`
 	Method      string `json:"method"`
 	Description string `json:"description"`
+}
+
+func newWalkResponse() *WalkResponse {
+	return &WalkResponse{
+		Routes: make([]*Route, 0),
+	}
 }
 
 func (api *apiServer) walkRouter(w http.ResponseWriter, r *http.Request) {

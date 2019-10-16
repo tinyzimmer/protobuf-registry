@@ -48,6 +48,9 @@ type ProtoDependency struct {
 }
 
 func NewProtoReqFromReader(rdr io.ReadCloser) (*PostProtoRequest, error) {
+	if rdr == nil {
+		return nil, errors.New("Got nil body")
+	}
 	defer rdr.Close()
 	req := PostProtoRequest{
 		Version:       defaultVersion,

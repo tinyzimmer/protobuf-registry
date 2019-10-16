@@ -19,7 +19,6 @@ package apirouter
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -93,31 +92,26 @@ func (api *apiServer) downloadProtoHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func getGenerateTarget(target string) (protobuf.GenerateTarget, error) {
-	var out protobuf.GenerateTarget
-	var err error
 	switch target {
 	case "cpp":
-		out = protobuf.GenerateTargetCPP
+		return protobuf.GenerateTargetCPP, nil
 	case "csharp":
-		out = protobuf.GenerateTargetCSharp
+		return protobuf.GenerateTargetCSharp, nil
 	case "java":
-		out = protobuf.GenerateTargetJava
-	case "javanano":
-		out = protobuf.GenerateTargetJavaNano
+		return protobuf.GenerateTargetJava, nil
 	case "js":
-		out = protobuf.GenerateTargetJS
+		return protobuf.GenerateTargetJS, nil
 	case "objc":
-		out = protobuf.GenerateTargetObjC
+		return protobuf.GenerateTargetObjC, nil
 	case "php":
-		out = protobuf.GenerateTargetPHP
+		return protobuf.GenerateTargetPHP, nil
 	case "python":
-		out = protobuf.GenerateTargetPython
+		return protobuf.GenerateTargetPython, nil
 	case "ruby":
-		out = protobuf.GenerateTargetRuby
+		return protobuf.GenerateTargetRuby, nil
 	case "go":
-		out = protobuf.GenerateTargetGo
+		return protobuf.GenerateTargetGo, nil
 	default:
-		err = errors.New("Unknown target")
+		return protobuf.GenerateTarget(-1), fmt.Errorf("Unsupported codegen target: %s", target)
 	}
-	return out, err
 }

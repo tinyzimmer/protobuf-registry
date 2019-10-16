@@ -20,7 +20,6 @@ package protobuf
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -48,11 +47,7 @@ func (p *Protobuf) CompileDescriptorSet() error {
 	}
 	defer os.RemoveAll(tempPath)
 	importPaths = append(importPaths, tempPath)
-	tempOut, err := ioutil.TempDir("", "")
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(tempOut)
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.GlobalConfig.CompileTimeout)*time.Second)
 	defer cancel()
 
@@ -63,7 +58,7 @@ func (p *Protobuf) CompileDescriptorSet() error {
 	args = append(args, []string{
 		"--include_imports",
 		"--include_source_info",
-		fmt.Sprintf("--descriptor_set_out=%s", filepath.Join(tempOut, "descriptor.pb")),
+		fmt.Sprintf("--descriptor_set_out=%s", os.Stdout.Name()),
 	}...)
 	args = append(args, tempFilesToStrings(tempFiles, "")...)
 	out, err := exec.CommandContext(ctx,
@@ -73,7 +68,7 @@ func (p *Protobuf) CompileDescriptorSet() error {
 	if err != nil {
 		return fmt.Errorf("failed to compile protocol spec: %s", string(out))
 	}
-	p.descriptor, err = ioutil.ReadFile(filepath.Join(tempOut, "descriptor.pb"))
+	p.descriptor = out
 	return err
 }
 

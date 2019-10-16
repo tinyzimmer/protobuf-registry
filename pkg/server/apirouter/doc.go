@@ -17,13 +17,15 @@
 
 package apirouter
 
+var noDocsForRoute = "No documentation for this route"
+
 func GetDoc(path, method string) string {
 	if docObj, ok := routeDocumentation[path]; ok {
 		if doc, ok := docObj[method]; ok {
 			return doc
 		}
 	}
-	return "No documentation for this route"
+	return noDocsForRoute
 }
 
 var routeDocumentation = map[string]map[string]string{

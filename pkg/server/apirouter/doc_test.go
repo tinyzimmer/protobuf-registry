@@ -15,30 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
-package protobuf
+package apirouter
 
-import (
-	"os"
-	"testing"
+import "testing"
 
-	"github.com/tinyzimmer/protobuf-registry/pkg/config"
-)
-
-func TestCompileDescriptorSet(t *testing.T) {
-	proto := newTestProtoWithData(t)
-	os.Setenv("IGNORE_PROTOC", "true")
-	_ = config.Init()
-	config.GlobalConfig.ProtocPath = "echo"
-	if err := proto.CompileDescriptorSet(); err != nil {
-		t.Error("Expected no error got:", err)
+func TestGetDoc(t *testing.T) {
+	doc := GetDoc("/api", "GET")
+	if doc == noDocsForRoute {
+		t.Error("Got no docs for known route")
 	}
-	config.GlobalConfig.ProtocPath = "bad-non-exist"
-	if err := proto.CompileDescriptorSet(); err == nil {
-		t.Error("Expected error from bad executable, got nil")
+	doc = GetDoc("/404", "GET")
+	if doc != noDocsForRoute {
+		t.Error("Got docs back for unknown route")
 	}
-	proto.SetRaw(nil)
-	if err := proto.CompileDescriptorSet(); err == nil {
-		t.Error("Expected error from no data, got nil")
-	}
-	os.Unsetenv("IGNORE_PROTOC")
 }

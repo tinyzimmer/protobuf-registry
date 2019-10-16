@@ -19,6 +19,7 @@ package common
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -40,6 +41,9 @@ func GetVersion(r *http.Request) string {
 }
 
 func UnmarshallInto(body io.Reader, obj interface{}) error {
+	if body == nil {
+		return errors.New("Received empty body")
+	}
 	raw, err := ioutil.ReadAll(body)
 	if err != nil {
 		return err
