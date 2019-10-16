@@ -17,33 +17,15 @@
 
 package common
 
-import (
-	"errors"
-	"fmt"
-	"net/http"
+import "testing"
 
-	"github.com/go-logr/glogr"
-	"github.com/tinyzimmer/protobuf-registry/pkg/config"
-)
-
-var log = glogr.New()
-
-var _ http.Handler = &CatchAllHandler{}
-
-type CatchAllHandler struct {
-	http.Handler
-}
-
-func (c *CatchAllHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if config.GlobalConfig.RedirectNotFoundToUI {
-		http.Redirect(w, r, "/ui", http.StatusSeeOther)
-		return
+func TestServerError(t *testing.T) {
+	err := &ServerError{ErrMsg: "test error"}
+	if err.Error() != "test error" {
+		t.Error("Error message came back malformed, got:", err.Error())
 	}
-	// log all the req data in case we are debugging discovery
-	log.Info(fmt.Sprintf("%+v", r))
-	NotFound(errors.New("No handler for this route"), w)
-}
-
-func NewCatchAllHandler() *CatchAllHandler {
-	return &CatchAllHandler{}
+	o := err.JSON()
+	if len(o) == 0 {
+		t.Error("Got back empty string for JSON method")
+	}
 }

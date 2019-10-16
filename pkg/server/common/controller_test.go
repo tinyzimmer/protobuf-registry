@@ -16,3 +16,29 @@
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
 package common
+
+import (
+	"testing"
+
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/tinyzimmer/protobuf-registry/pkg/database"
+	"github.com/tinyzimmer/protobuf-registry/pkg/storage"
+)
+
+func TestControllerSettersAndGetters(t *testing.T) {
+	config.SafeInit()
+	ctrl := &ServerController{}
+
+	store := storage.GetProvider(config.GlobalConfig)
+	db := database.GetEngine(config.GlobalConfig)
+
+	ctrl.SetDBEngine(db)
+	if ctrl.DB() != db {
+		t.Error("Wrong pointer got set to DB engine")
+	}
+
+	ctrl.SetStorageProvider(store)
+	if ctrl.Storage() != store {
+		t.Error("Wrong pointer got set to storage provider")
+	}
+}

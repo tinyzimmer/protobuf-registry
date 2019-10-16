@@ -41,6 +41,13 @@ func Init() error {
 	return nil
 }
 
+// SafeInit is used from unit tests to ignore protoc
+func SafeInit() {
+	os.Setenv("IGNORE_PROTOC", "true")
+	_ = Init()
+	os.Unsetenv("IGNORE_PROTOC")
+}
+
 type Config struct {
 	// Server Settings
 	BindAddress  string `long:"bind-address" env:"BIND_ADDRESS" default:"0.0.0.0:8080" json:"bind_address" description:"The address and port for the server to listen on"`

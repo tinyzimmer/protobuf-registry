@@ -45,6 +45,7 @@ func (f *fileProvider) mkdirAll(path string) error {
 }
 
 func (f *fileProvider) writeRawToDisk(path string, data []byte) error {
+	log.Info("Writing data to local directory", "path", path)
 	if err := f.mkdirAll(filepath.Dir(path)); err != nil {
 		return err
 	}
@@ -53,5 +54,6 @@ func (f *fileProvider) writeRawToDisk(path string, data []byte) error {
 
 func (f *fileProvider) deleteFromDisk(path string) error {
 	// If the path does not exist, RemoveAll returns nil (no error)
+	log.Info("Removing all of local directory", "path", path)
 	return os.RemoveAll(path)
 }

@@ -66,7 +66,7 @@ run_persistent: build
 		--rm \
 		-p 8080:8080 \
 		-v "`pwd`/data:/opt/proto-registry/data" \
-		${IMG} --persist-memory
+		${IMG} --persist-memory --ui-redirect-all
 
 test_data:
 	cd hack && NUM=${NUM} REGISTRY_HOST=${REGISTRY_HOST} bash add_test_data.sh

@@ -18,32 +18,34 @@
 package common
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
+	"net/http/httptest"
+	"testing"
 
-	"github.com/go-logr/glogr"
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 )
 
-var log = glogr.New()
+func TestCatchAllHandler(t *testing.T) {
+	config.SafeInit()
 
-var _ http.Handler = &CatchAllHandler{}
-
-type CatchAllHandler struct {
-	http.Handler
-}
-
-func (c *CatchAllHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if config.GlobalConfig.RedirectNotFoundToUI {
-		http.Redirect(w, r, "/ui", http.StatusSeeOther)
-		return
+	handler := NewCatchAllHandler()
+	req, err := http.NewRequest("GET", "/random", nil)
+	if err != nil {
+		t.Fatal(err)
 	}
-	// log all the req data in case we are debugging discovery
-	log.Info(fmt.Sprintf("%+v", r))
-	NotFound(errors.New("No handler for this route"), w)
-}
+	rr := httptest.NewRecorder()
 
-func NewCatchAllHandler() *CatchAllHandler {
-	return &CatchAllHandler{}
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusNotFound {
+		t.Error("Expected 404, got:", rr.Code)
+	}
+
+	config.GlobalConfig.RedirectNotFoundToUI = true
+	rr = httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Error("Expected redirect, got:", rr.Code)
+	}
 }

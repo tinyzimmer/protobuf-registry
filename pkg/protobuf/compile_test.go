@@ -18,7 +18,6 @@
 package protobuf
 
 import (
-	"os"
 	"testing"
 
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
@@ -26,8 +25,7 @@ import (
 
 func TestCompileDescriptorSet(t *testing.T) {
 	proto := newTestProtoWithData(t)
-	os.Setenv("IGNORE_PROTOC", "true")
-	_ = config.Init()
+	config.SafeInit()
 	config.GlobalConfig.ProtocPath = "echo"
 	if err := proto.CompileDescriptorSet(); err != nil {
 		t.Error("Expected no error got:", err)
@@ -40,5 +38,4 @@ func TestCompileDescriptorSet(t *testing.T) {
 	if err := proto.CompileDescriptorSet(); err == nil {
 		t.Error("Expected error from no data, got nil")
 	}
-	os.Unsetenv("IGNORE_PROTOC")
 }

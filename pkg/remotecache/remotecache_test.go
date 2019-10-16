@@ -27,9 +27,7 @@ import (
 
 func setConfig(t *testing.T) (rm func()) {
 	t.Helper()
-	os.Setenv("IGNORE_PROTOC", "true")
-	_ = config.Init()
-	os.Unsetenv("IGNORE_PROTOC")
+	config.SafeInit()
 	config.GlobalConfig.FileStoragePath, _ = ioutil.TempDir("", "")
 	return func() { os.RemoveAll(config.GlobalConfig.FileStoragePath) }
 }

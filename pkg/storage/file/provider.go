@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/go-logr/glogr"
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
 	"github.com/tinyzimmer/protobuf-registry/pkg/storage/common"
@@ -29,6 +30,8 @@ import (
 
 const zipFileName = "proto.zip"
 const descriptorFileName = "descriptors.pb"
+
+var log = glogr.New()
 
 type fileProvider struct {
 	common.Provider
@@ -67,7 +70,7 @@ func (f *fileProvider) StoreProtoPackage(in *protobuf.Protobuf) error {
 }
 
 func (f *fileProvider) DeleteProtoPackage(in *protobuf.Protobuf) error {
-	path := filepath.Join(f.root(), *in.ID)
+	path := filepath.Join(f.protoRoot(), *in.ID)
 	return f.deleteFromDisk(path)
 }
 

@@ -18,7 +18,6 @@
 package protobuf
 
 import (
-	"os"
 	"testing"
 
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
@@ -26,8 +25,7 @@ import (
 
 func TestGenerateTo(t *testing.T) {
 	proto := newTestProtoWithData(t)
-	os.Setenv("IGNORE_PROTOC", "true")
-	_ = config.Init()
+	config.SafeInit()
 	// set protoc executable to echo
 	config.GlobalConfig.ProtocPath = "echo"
 
@@ -61,5 +59,4 @@ func TestGenerateTo(t *testing.T) {
 		t.Error("Expected error from bad executable, got:", err)
 	}
 
-	os.Unsetenv("IGNORE_PROTOC")
 }

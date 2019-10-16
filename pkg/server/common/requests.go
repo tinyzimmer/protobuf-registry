@@ -63,7 +63,11 @@ func NotFound(err error, w http.ResponseWriter) {
 }
 
 func WriteJSONResponse(res interface{}, w http.ResponseWriter) {
-	out, _ := json.MarshalIndent(res, "", "    ")
+	out, err := json.MarshalIndent(res, "", "    ")
+	if err != nil {
+		BadRequest(fmt.Errorf("Failed to write JSON response: %s", err.Error()), w)
+		return
+	}
 	WriteRawResponse(out, w)
 }
 
@@ -71,7 +75,6 @@ func WriteRawResponse(out []byte, w http.ResponseWriter) {
 	if config.GlobalConfig.CORSEnabled {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 	}
-	// w.WriteHeader(http.StatusOK)
 	if _, err := w.Write(append(out, "\n"...)); err != nil {
 		BadRequest(err, w)
 	}

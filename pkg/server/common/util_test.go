@@ -17,33 +17,15 @@
 
 package common
 
-import (
-	"errors"
-	"fmt"
-	"net/http"
+import "testing"
 
-	"github.com/go-logr/glogr"
-	"github.com/tinyzimmer/protobuf-registry/pkg/config"
-)
-
-var log = glogr.New()
-
-var _ http.Handler = &CatchAllHandler{}
-
-type CatchAllHandler struct {
-	http.Handler
-}
-
-func (c *CatchAllHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if config.GlobalConfig.RedirectNotFoundToUI {
-		http.Redirect(w, r, "/ui", http.StatusSeeOther)
-		return
+func TestParseNameVersionExtString(t *testing.T) {
+	infile := "test-0.0.1.tar.gz"
+	name, version := ParseNameVersionExtString(infile, ".tar.gz")
+	if name != "test" {
+		t.Error("Expected 'test' as the name, got:", name)
 	}
-	// log all the req data in case we are debugging discovery
-	log.Info(fmt.Sprintf("%+v", r))
-	NotFound(errors.New("No handler for this route"), w)
-}
-
-func NewCatchAllHandler() *CatchAllHandler {
-	return &CatchAllHandler{}
+	if version != "0.0.1" {
+		t.Error("Expected '0.0.1' for version, got:", version)
+	}
 }

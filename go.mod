@@ -16,7 +16,6 @@ require (
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jhump/protoreflect v1.5.0
-	github.com/mattn/goveralls v0.0.3 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/pseudomuto/protoc-gen-doc v1.3.0
@@ -26,12 +25,10 @@ require (
 	golang.org/x/crypto v0.0.0-20191002192127-34f69633bfdc // indirect
 	golang.org/x/net v0.0.0-20191009170851-d66e71096ffb // indirect
 	golang.org/x/sys v0.0.0-20191009170203-06d7bd2c5f4f // indirect
-	golang.org/x/tools v0.0.0-20191015150414-f936694f27bf // indirect
 	google.golang.org/genproto v0.0.0-20191007204434-a023cd5227bd // indirect
 	google.golang.org/grpc v1.24.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2
 	gopkg.in/src-d/go-git.v4 v4.13.1
 	gopkg.in/yaml.v2 v2.2.4 // indirect
-	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc
 )

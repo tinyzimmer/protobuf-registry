@@ -55,6 +55,8 @@ func TestInit(t *testing.T) {
 		t.Error("Expected json response, got empty byte slice")
 	}
 
+	// Call safe init just for coverage
+	SafeInit()
 }
 
 func TestDefaults(t *testing.T) {

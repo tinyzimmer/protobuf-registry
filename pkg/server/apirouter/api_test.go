@@ -41,8 +41,7 @@ var testProtoVersion = "0.0.1"
 
 func getController(t *testing.T) (*common.ServerController, func()) {
 	t.Helper()
-	os.Setenv("IGNORE_PROTOC", "true")
-	_ = config.Init()
+	config.SafeInit()
 	config.GlobalConfig.CORSEnabled = true
 	config.GlobalConfig.FileStoragePath, _ = ioutil.TempDir("", "")
 	config.GlobalConfig.ProtocPath = "echo"
@@ -50,7 +49,6 @@ func getController(t *testing.T) (*common.ServerController, func()) {
 	ctrl := &common.ServerController{}
 	ctrl.SetDBEngine(database.GetEngine(config.GlobalConfig))
 	ctrl.SetStorageProvider(storage.GetProvider(config.GlobalConfig))
-	os.Unsetenv("IGNORE_PROTOC")
 	return ctrl, func() { os.RemoveAll(config.GlobalConfig.FileStoragePath) }
 }
 

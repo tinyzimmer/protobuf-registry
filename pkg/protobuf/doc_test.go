@@ -18,7 +18,6 @@
 package protobuf
 
 import (
-	"os"
 	"testing"
 
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
@@ -26,8 +25,7 @@ import (
 
 func TestDocJSON(t *testing.T) {
 	proto := newTestProtoWithData(t)
-	os.Setenv("IGNORE_PROTOC", "true")
-	_ = config.Init()
+	config.SafeInit()
 	config.GlobalConfig.ProtobufVersion = "3.6.1"
 	out, err := proto.DocJSON("TestProtoMessage.proto")
 	if err != nil {
@@ -46,5 +44,4 @@ func TestDocJSON(t *testing.T) {
 	if _, err = proto.DocJSON("TestProtoMessage.proto"); err == nil {
 		t.Error("Expected error from no descriptor set, got nil")
 	}
-	os.Unsetenv("IGNORE_PROTOC")
 }
