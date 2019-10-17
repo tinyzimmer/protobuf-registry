@@ -18,7 +18,6 @@
 package protobuf
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,17 +28,11 @@ import (
 	"github.com/tinyzimmer/protobuf-registry/pkg/remotecache"
 )
 
-func accessor(filename string) (io.ReadCloser, error) {
-	log.Info(filename)
-	return os.Open(filename)
-}
-
 func (p *Protobuf) CompileToDescriptorSet() error {
 	parser := &protoparse.Parser{
 		ImportPaths:           make([]string, 0),
 		InferImportPaths:      true,
 		IncludeSourceCodeInfo: true,
-		Accessor:              protoparse.FileAccessor(accessor),
 	}
 	tempPath, _, tempFiles, err := p.newTempFilesFromRaw(false)
 	if err != nil {

@@ -37,12 +37,7 @@ post-test-data() {
         {
           \"version\": \"$(random-version)\",
           \"name\": \"$msg-proto\",
-          \"body\": \"${b64data}\",
-          \"remoteDeps\": [
-            {
-              \"url\": \"github.com/googleapis/api-common-protos\"
-            }
-          ]
+          \"body\": \"${b64data}\"
         }"
   done
 }

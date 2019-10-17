@@ -41,13 +41,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	config.GlobalConfig.CompileDate = CompileDate
+	config.GlobalConfig.GitCommit = GitCommit
+
 	setupLog := log.WithName("setup")
 
 	// log the configuration
 	setupLog.Info(string(config.GlobalConfig.JSON()))
-
-	config.GlobalConfig.CompileDate = CompileDate
-	config.GlobalConfig.GitCommit = GitCommit
 
 	// start the webserver
 	setupLog.Info("Starting proto-registry server")

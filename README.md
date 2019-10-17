@@ -13,11 +13,45 @@ A repository, package manager, and file viewer for Protocol Buffers.
 This project is a repository for protocol buffer packages.
 Groups of `.proto` files can be kept in the registry and versioned appropriately.
 You can then retrieve details on your packages as well as generated code and descriptor sets with simple API calls.
-There is also a Web UI available for visualizing your packages and other ad-hoc operations.
+There is also a Web UI available for visualizing your packages, their documentation, and other ad-hoc operations.
 
 Where feasible, I want to support package manager discovery for various languages.
 This functionality already works for `pip` and `go`, however it is obviously a challenge for other ones.
 For example, with `maven`, I'd rather not include a Java compiler with the build image, but you can still download a ready-to-package directory.
+
+### Uploading Packages
+
+You can upload packages via the UI or the API.
+Via the API it is done by sending a POST or PUT request to `/api/proto`.
+A PUT request will overwrite an existing package of the same name and version, but a POST attempt to overwrite will fail.
+
+An example self-contained package
+
+```json
+{
+  "name": "package_name",
+  "version": "package_version (default: 0.0.1)",
+  "body": "<base64_encoded_zip>"
+}
+```
+
+Package with remote imports
+
+```json
+{
+  "name": "package_name",
+  "version": "package_version (default: 0.0.1)",
+  "body": "<base64_encoded_zip>",
+  "remoteDeps": [
+    {
+      "url": "github.com/googleapis/api-common-protos",
+      "revision": "master"
+    }
+  ]
+}
+```
+
+The above example uses the Google common protocol buffer files, but it is not required to import those explicitly. They are automatically included in the package if they are needed.
 
 ### Pip discovery
 
@@ -102,23 +136,21 @@ For example, `PRE_CACHED_REMOTES="github.com/googleapis/api-common-protos"`.
 The image can be configured via environment variables or on the command-line.
 Options are limited right now, but it is setup in a way to easily add new interfaces for different backends.
 
-| Name                              | Default                   |Description                                                         |
-|:---------------------------------:|:-------------------------:|:-------------------------------------------------------------------|
-|`BIND_ADDRESS`      |`0.0.0.0:8080`             |The address and port to bind to.                                                   |
-|`READ_TIMEOUT`      | `15`                      |Read timeout for API/UI `HTTP` requests.                                           |
-|`WRITE_TIMEOUT`     | `15`                      |Write timeout for API/UI `HTTP` requests.                                          |
-|`COMPILE_TIMEOUT`   | `10`                      |Timeout for `protoc` invocations.                                                  |
-|`PROTOC_PATH`       | `/usr/bin/protoc`         |Path to the `protoc` executable. Leave unchanged in docker image. Used for codegen.|
-|`PROTOC_GEN_GO_PATH`|`/opt/proto-registry/bin/protoc-gen-go` |The path to a compiled `protoc-gen-go` plugin until I can get gocode generation to work independently via its exported interfaces|
-|`DATABASE_DRIVER`   | `memory`                  |Driver to use for database operations, only `memory` currently.                    |
-|`STORAGE_DRIVER`    | `file`                    |Driver to use for file storage operations, only `file` currently.                  |
-|`FILE_STORAGE_PATH` | `/opt/proto-registry/data`|Path to file storage when using file storage driver.                               |
-|`PERSIST_MEMORY`    | `false`                   |Persist the in-memory database to disk after write operations.                     |
-|`PRE_CACHED_REMOTES`| `[]`                      |A comma-separated list of remote git repositories to pre-cache for compilations.   |
-|`UI_REDIRECT_ALL`   | `false`                   |Redirect all unknown routes to the UI. Useful to turn off for discovery debugging. |
-|`ENABLE_CORS`       | `false`                   |Enable CORS headers for API requests.                                              |
-
-The CLI equivalents line up to the environment variables (just as lowercase) for the most part. You can pass `--help` to the app or docker container to see all the options:
+| EnvVar             | Command-Line         |  Default                 |  Description                                                                       |
+|:------------------:|:--------------------:|:------------------------:|:-----------------------------------------------------------------------------------|
+|`BIND_ADDRESS`      |`--bind-address`      |`0.0.0.0:8080`             |The address and port to bind to.                                                   |
+|`READ_TIMEOUT`      |`--read-timeout`      | `15`                      |Read timeout for API/UI `HTTP` requests.                                           |
+|`WRITE_TIMEOUT`     |`--write-timeout`     | `15`                      |Write timeout for API/UI `HTTP` requests.                                          |
+|`COMPILE_TIMEOUT`   |`--compile-timeout`   | `10`                      |Timeout for `protoc` invocations. Only applies to codegen now.                     |
+|`PROTOC_PATH`       |`--protoc-path`       | `/usr/bin/protoc`         |Path to the `protoc` executable. Leave unchanged in docker image. Used for codegen.|
+|`PROTOC_GEN_GO_PATH`|`--protoc-gen-go-path`|`/opt/proto-registry/bin/protoc-gen-go` |The path to a compiled `protoc-gen-go` plugin until I can get gocode generation to work independently via its exported interfaces|
+|`DATABASE_DRIVER`   |`--database-driver`   | `memory`                  |Driver to use for database operations, only `memory` currently.                    |
+|`STORAGE_DRIVER`    |`--storage-driver`    | `file`                    |Driver to use for file storage operations, only `file` currently.                  |
+|`FILE_STORAGE_PATH` |`--file-storage-path` | `/opt/proto-registry/data`|Path to file storage when using file storage driver.                               |
+|`PERSIST_MEMORY`    |`--persist-memory`    | `false`                   |Persist the in-memory database to disk after write operations.                     |
+|`PRE_CACHED_REMOTES`|`--pre-cached-remotes`| `[]`                      |A comma-separated list of remote git repositories to pre-cache for compilations.   |
+|`UI_REDIRECT_ALL`   |`--ui-redirect-all`   | `false`                   |Redirect all unknown routes to the UI. Useful to turn off for discovery debugging. |
+|`ENABLE_CORS`       |`--enable-cors`       | `false`                   |Enable CORS headers for API requests.                                              |
 
 ## Development
 
