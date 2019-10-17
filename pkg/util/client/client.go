@@ -30,35 +30,43 @@ import (
 // RegistryClient is the exported interface for client-side protobuf-registry
 // requests and operations.
 type RegistryClient interface {
+
 	// GetServerConfig returns the configuration of the server
 	GetServerConfig() (*config.Config, error)
 	GetServerConfigWithContext(context.Context) (*config.Config, error)
+
 	// UploadProtoPackage uploads a new protocol buffer spec to the server.
 	// If overwrite is true, it will replace an existing package with the same
 	// name and version.
 	UploadProtoPackage(req *types.PostProtoRequest, overwrite bool) (*Protobuf, error)
 	UploadProtoPackageWithContext(ctx context.Context, req *types.PostProtoRequest, overwrite bool) (*Protobuf, error)
+
 	// ListProtoPackages returns all the protocol packages on the server. The
 	// protobuf object methods returned by this call are not safe to use. They are the
 	// same interface the server uses and will later be seperated from this request.
 	// To get a protobuf object with use-able methods, use GetProtoPackageVersions
 	ListProtoPackages() (*types.ListProtoResponse, error)
 	ListProtoPackagesWithContext(context.Context) (*types.ListProtoResponse, error)
+
 	// GetProtoPackageVersions will retrieve a list of all the protocol buffer
 	// packages with the provided name
 	GetProtoPackageVersions(name string) ([]*Protobuf, error)
 	GetProtoPackageVersionsWithContext(ctx context.Context, name string) ([]*Protobuf, error)
+
 	// GetProtoPackage retrieves details about the package with the given name
 	// and version
 	GetProtoPackage(name, version string) (*protobuf.ProtobufDescriptors, error)
 	GetProtoPackageWithContext(ctx context.Context, name, version string) (*protobuf.ProtobufDescriptors, error)
+
 	// DeleteAllProtoPackageVersions deletes all versions for the given protocol
 	// name
 	DeleteAllProtoPackageVersions(name string) error
 	DeleteAllProtoPackageVersionsWithContext(ctx context.Context, name string) error
+
 	// DeleteProtoPackage deletes the package with the given name and version
 	DeleteProtoPackage(name, version string) error
 	DeleteProtoPackageWithContext(ctx context.Context, name, version string) error
+
 	// DownloadProtoPackage retrieves the raw bytes for the package name and version
 	// in the provided format.
 	// TODO: Will use an enum for the format. Also note the following formats used:
@@ -68,18 +76,22 @@ type RegistryClient interface {
 	// Will likely make these more consistent
 	DownloadProtoPackage(name, version, format string) ([]byte, error)
 	DownloadProtoPackageWithContext(ctx context.Context, name, version, format string) ([]byte, error)
+
 	// GetFileContents retrieves the contents of the file in the given package
 	// name and version
 	GetFileContents(pkgName, pkgVersion, filename string) (*types.GetFileContentsResponse, error)
 	GetFileContentsWithContext(ctx context.Context, pkgName, pkgVersion, filename string) (*types.GetFileContentsResponse, error)
+
 	// GetFileDocs returns documentation for the file in the given package name
 	// and version
 	GetFileDocs(pkgName, pkgVersion, filename string) (map[string]interface{}, error)
 	GetFileDocsWithContext(ctx context.Context, pkgName, pkgVersion, filename string) (map[string]interface{}, error)
+
 	// GetCachedRemotes retrieves the list of currently cached remote repositories
 	// on the server
 	GetCachedRemotes() ([]string, error)
 	GetCachedRemotesWithContext(ctx context.Context) ([]string, error)
+
 	// PutCachedRemote ensures a cached remote repository on the server -
 	// This call is idempotent.
 	PutCachedRemote(req *types.PutRemoteRequest) error

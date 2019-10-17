@@ -96,8 +96,6 @@ This should be possible for _most_ interpreted languages (ruby marshaling in gol
 
 This project was primarily just me being bored and wanting to build something, but also was an opportunity for me to finally start learning some modern front-end technologies while making the UI. However, if I decide to keep building on it, I eventually want to incorporate elements from [`prototool`](https://github.com/uber/prototool) as well. Since it's also in go it would be easy to include some of their functionality (e.g. linting).
 
-Heck, maybe even add Avro support later.
-
 ## Running
 
 You can build and run the image locally with `make run` or there is a docker image available at `tinyzimmer/protobuf-registry`.
@@ -122,14 +120,23 @@ To enable persistence run with the following flags:
 $> docker run \
     -p 8080:8080 \
     -v "`pwd`/data:/data" \
-    -e PERSIST_MEMORY=true \
-    tinyzimmer/protobuf-registry
+    tinyzimmer/protobuf-registry --persist-memory
 ```
 
 The data directory will also hold the cache of remote repositories that are referenced by protobuf packages.
 `POST` operations may take a while if they rely on large repositories for imported definitions that are not yet cached.
 You can enforce a cache of certain repsitories by setting `PRE_CACHED_REMOTES` in the environment.
 For example, `PRE_CACHED_REMOTES="github.com/googleapis/api-common-protos"`.
+
+### Test data
+
+If you don't have any `proto` files handy and want to see the UI with some data in it, then you can use the test data inside this repository.
+
+If you have `go` installed and the server running at http://localhost:8080 then you can just run `make test_data`.
+If you don't have `go` installed, just look at the `hack/add_test_data.sh` script and swap out the parts that are commented with the line that invokes `util.go`.
+I used `util.go` to try out the client interface, but I left the commands that just use raw `zip` and `curl` calls in case those are easier.
+
+I may make a full CLI from the client interfaces in `pkg/util/client` at some point. 
 
 ### Configuration
 

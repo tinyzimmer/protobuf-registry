@@ -2,7 +2,7 @@ GOLANGCI_VERSION = 1.18.0
 
 IMG ?= protobuf-registry:latest
 NUM ?= 1
-REGISTRY_HOST ?= localhost:8080
+REGISTRY_HOST ?= http://localhost:8080
 
 NUM_PACKAGES = $(shell find pkg -type d | wc -l)
 
@@ -18,7 +18,7 @@ bin/golangci-lint-${GOLANGCI_VERSION}:
 	@mv bin/golangci-lint $@
 
 license-check:
-	go run hack/licensecheck.go
+	go run hack/util.go license-check
 
 .PHONY: lint
 lint: bin/golangci-lint ## Run linter

@@ -1,11 +1,16 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/tinyzimmer/protobuf-registry/pkg/types"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util/client"
 )
 
 var licenseHeader = `// Copyright © 2019 tinyzimmer
@@ -26,7 +31,7 @@ var licenseHeader = `// Copyright © 2019 tinyzimmer
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 `
 
-func main() {
+func licenseCheck() {
 	missing := make([]string, 0)
 	for _, dir := range []string{"pkg/", "cmd/"} {
 		if err := filepath.Walk(dir, func(path string, info os.FileInfo, e error) error {
@@ -56,5 +61,35 @@ func main() {
 		os.Exit(1)
 	} else {
 		log.Println("All source files contain the license header")
+	}
+}
+
+// upload <name> <version> <dir>
+func upload() {
+	body, err := client.DirToUploadBody(os.Args[4])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c := client.New(os.Getenv("REGISTRY_HOST"))
+
+	if proto, err := c.UploadProtoPackage(&types.PostProtoRequest{
+		Name:    os.Args[2],
+		Version: os.Args[3],
+		Body:    body,
+	}, false); err != nil {
+		log.Fatal(err)
+	} else {
+		out, _ := json.MarshalIndent(proto, "", "    ")
+		fmt.Println(string(out))
+	}
+}
+
+func main() {
+	switch os.Args[1] {
+	case "license-check":
+		licenseCheck()
+	case "upload":
+		upload()
 	}
 }

@@ -1,9 +1,9 @@
 #!/bin/bash
 
 main() {
-  zip-proto
+  # zip-proto
   post-test-data
-  clean
+  # clean
 }
 
 random-version() {
@@ -28,17 +28,18 @@ post-test-data() {
   if [[ -z "${REGISTRY_HOST}" ]] ; then
     REGISTRY_HOST="localhost:8080"
   fi
-  b64data=$(cat ./test_protobuf/proto.zip | base64 --wrap=0)
+  # b64data=$(cat ./test_protobuf/proto.zip | base64 --wrap=0)
   messagenames=($(shuf -n ${NUM}  /usr/share/dict/words | sed "s/'//g" | tr '[:upper:]' '[:lower:]'))
   for msg in "${messagenames[@]}" ; do
-    curl \
-      -X POST ${REGISTRY_HOST}/api/proto \
-      --data "
-        {
-          \"version\": \"$(random-version)\",
-          \"name\": \"$msg-proto\",
-          \"body\": \"${b64data}\"
-        }"
+    # curl \
+    #   -X POST ${REGISTRY_HOST}/api/proto \
+    #   --data "
+    #     {
+    #       \"version\": \"$(random-version)\",
+    #       \"name\": \"$msg-proto\",
+    #       \"body\": \"${b64data}\"
+    #     }"
+    go run util.go upload "${msg}-proto" "$(random-version)" ./test_protobuf/
   done
 }
 
