@@ -18,7 +18,9 @@
 package client
 
 import (
+	"context"
 	"net/http"
+	"strings"
 
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
@@ -30,64 +32,80 @@ import (
 type RegistryClient interface {
 	// GetServerConfig returns the configuration of the server
 	GetServerConfig() (*config.Config, error)
-	UploadProtoPackage(*types.PostProtoRequest, bool) (*Protobuf, error)
-	UploadProtoPackageFromDir(dir string, force bool) (*Protobuf, error)
+	GetServerConfigWithContext(context.Context) (*config.Config, error)
+	// UploadProtoPackage uploads a new protocol buffer spec to the server.
+	// If overwrite is true, it will replace an existing package with the same
+	// name and version.
+	UploadProtoPackage(req *types.PostProtoRequest, overwrite bool) (*Protobuf, error)
+	UploadProtoPackageWithContext(ctx context.Context, req *types.PostProtoRequest, overwrite bool) (*Protobuf, error)
+	// ListProtoPackages returns all the protocol packages on the server. The
+	// protobuf object methods returned by this call are not safe to use. They are the
+	// same interface the server uses and will later be seperated from this request.
+	// To get a protobuf object with use-able methods, use GetProtoPackageVersions
+	ListProtoPackages() (*types.ListProtoResponse, error)
+	ListProtoPackagesWithContext(context.Context) (*types.ListProtoResponse, error)
+	// GetProtoPackageVersions will retrieve a list of all the protocol buffer
+	// packages with the provided name
 	GetProtoPackageVersions(name string) ([]*Protobuf, error)
-	DeleteAllProtoPackageVersions(name string) error
+	GetProtoPackageVersionsWithContext(ctx context.Context, name string) ([]*Protobuf, error)
+	// GetProtoPackage retrieves details about the package with the given name
+	// and version
 	GetProtoPackage(name, version string) (*protobuf.ProtobufDescriptors, error)
+	GetProtoPackageWithContext(ctx context.Context, name, version string) (*protobuf.ProtobufDescriptors, error)
+	// DeleteAllProtoPackageVersions deletes all versions for the given protocol
+	// name
+	DeleteAllProtoPackageVersions(name string) error
+	DeleteAllProtoPackageVersionsWithContext(ctx context.Context, name string) error
+	// DeleteProtoPackage deletes the package with the given name and version
 	DeleteProtoPackage(name, version string) error
+	DeleteProtoPackageWithContext(ctx context.Context, name, version string) error
+	// DownloadProtoPackage retrieves the raw bytes for the package name and version
+	// in the provided format.
+	// TODO: Will use an enum for the format. Also note the following formats used:
+	// - raw: .zip
+	// - descriptors: marshaled proto descriptor set (equivalent of --descriptor_set_out)
+	// - language (codegen): .tar.gz
+	// Will likely make these more consistent
 	DownloadProtoPackage(name, version, format string) ([]byte, error)
-	GetFileContents(pkgName, pkgVersion, filename string) ([]byte, error)
+	DownloadProtoPackageWithContext(ctx context.Context, name, version, format string) ([]byte, error)
+	// GetFileContents retrieves the contents of the file in the given package
+	// name and version
+	GetFileContents(pkgName, pkgVersion, filename string) (*types.GetFileContentsResponse, error)
+	GetFileContentsWithContext(ctx context.Context, pkgName, pkgVersion, filename string) (*types.GetFileContentsResponse, error)
+	// GetFileDocs returns documentation for the file in the given package name
+	// and version
 	GetFileDocs(pkgName, pkgVersion, filename string) (map[string]interface{}, error)
+	GetFileDocsWithContext(ctx context.Context, pkgName, pkgVersion, filename string) (map[string]interface{}, error)
+	// GetCachedRemotes retrieves the list of currently cached remote repositories
+	// on the server
 	GetCachedRemotes() ([]string, error)
-	PutCachedRemote(remote string) error
+	GetCachedRemotesWithContext(ctx context.Context) ([]string, error)
+	// PutCachedRemote ensures a cached remote repository on the server -
+	// This call is idempotent.
+	PutCachedRemote(req *types.PutRemoteRequest) error
+	PutCachedRemoteWithContext(ctx context.Context, req *types.PutRemoteRequest) error
 }
 
-// Protobuf struct is a client-side implementation of the protobuf objects -
-// Methods in the server interface will be replaced with client-side API calls
+// Protobuf struct is a client-side implementation of the API's protobuf struct -
+// Methods in the server interface will be replaced here with client-side API calls
 type Protobuf struct {
-	ID      *string
-	Name    *string
-	Version *string
-
-	client *registryClient
+	ID           *string                     `json:"id"`
+	Name         *string                     `json:"name"`
+	Version      *string                     `json:"version"`
+	Dependencies []*protobuf.ProtoDependency `json:"dependencies"`
+	client       *registryClient
 }
 
 // registryClient implements RegistryClient
 type registryClient struct {
-	Server string
-
+	baseURL    string
 	httpclient *http.Client
 }
 
 // New returns a new RegistryClient using the provided URL
 func New(url string) RegistryClient {
-	return &registryClient{Server: url}
+	return &registryClient{
+		baseURL:    strings.TrimSuffix(url, "/"),
+		httpclient: &http.Client{},
+	}
 }
-
-// TODO //
-
-func (r *registryClient) GetServerConfig() (*config.Config, error) { return nil, nil }
-func (r *registryClient) UploadProtoPackage(*types.PostProtoRequest, bool) (*Protobuf, error) {
-	return nil, nil
-}
-func (r *registryClient) UploadProtoPackageFromDir(dir string, force bool) (*Protobuf, error) {
-	return nil, nil
-}
-func (r *registryClient) GetProtoPackageVersions(name string) ([]*Protobuf, error) { return nil, nil }
-func (r *registryClient) DeleteAllProtoPackageVersions(name string) error          { return nil }
-func (r *registryClient) GetProtoPackage(name, version string) (*protobuf.ProtobufDescriptors, error) {
-	return nil, nil
-}
-func (r *registryClient) DeleteProtoPackage(name, version string) error { return nil }
-func (r *registryClient) DownloadProtoPackage(name, version, format string) ([]byte, error) {
-	return nil, nil
-}
-func (r *registryClient) GetFileContents(pkgName, pkgVersion, filename string) ([]byte, error) {
-	return nil, nil
-}
-func (r *registryClient) GetFileDocs(pkgName, pkgVersion, filename string) (map[string]interface{}, error) {
-	return nil, nil
-}
-func (r *registryClient) GetCachedRemotes() ([]string, error) { return nil, nil }
-func (r *registryClient) PutCachedRemote(remote string) error { return nil }

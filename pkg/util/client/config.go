@@ -15,21 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with protobuf-registry.  If not, see <https://www.gnu.org/licenses/>.
 
-package protobuf
+package client
 
-// func TestCompileDescriptorSet(t *testing.T) {
-// 	proto := newTestProtoWithData(t)
-// 	config.SafeInit()
-// 	config.GlobalConfig.ProtocPath = "echo"
-// 	if err := proto.CompileDescriptorSet(); err != nil {
-// 		t.Error("Expected no error got:", err)
-// 	}
-// 	config.GlobalConfig.ProtocPath = "bad-non-exist"
-// 	if err := proto.CompileDescriptorSet(); err == nil {
-// 		t.Error("Expected error from bad executable, got nil")
-// 	}
-// 	proto.SetRaw(nil)
-// 	if err := proto.CompileDescriptorSet(); err == nil {
-// 		t.Error("Expected error from no data, got nil")
-// 	}
-// }
+import (
+	"context"
+
+	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+)
+
+// GetServerConfig returns the current configuration of the server
+func (r *registryClient) GetServerConfig() (*config.Config, error) {
+	return r.GetServerConfigWithContext(context.Background())
+}
+
+// GetServerConfig returns the current configuration of the server
+func (r *registryClient) GetServerConfigWithContext(ctx context.Context) (*config.Config, error) {
+	req, err := r.newRequest(ctx, "GET", "api/config", nil)
+	if err != nil {
+		return nil, err
+	}
+	var config config.Config
+	return &config, r.doInto(req, &config)
+}

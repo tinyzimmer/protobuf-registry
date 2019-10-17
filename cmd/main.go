@@ -37,7 +37,7 @@ var catchSignals = []os.Signal{syscall.SIGINT, syscall.SIGTERM}
 
 func main() {
 
-	if err := config.Init(); err != nil {
+	if err := config.Init(false); err != nil {
 		os.Exit(1)
 	}
 

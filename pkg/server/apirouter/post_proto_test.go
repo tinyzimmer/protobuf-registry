@@ -64,28 +64,6 @@ func TestPostProtoHandler(t *testing.T) {
 		t.Error("Expected bad request, got:", rr.Code)
 	}
 
-	// test bad compiler
-	config.GlobalConfig.ProtocPath = "/not/exist/exec"
-	r := types.PostProtoRequest{
-		Name:    "some-proto",
-		Version: "0.0.1",
-		Body:    protobuf.TestProtoZip,
-	}
-	out, err := json.Marshal(r)
-	if err != nil {
-		t.Fatal(err)
-	}
-	req, err = http.NewRequest("POST", "/api/proto", bytes.NewReader(out))
-	if err != nil {
-		t.Fatal(err)
-	}
-	rr = httptest.NewRecorder()
-	srvr.router.ServeHTTP(rr, req)
-	if rr.Code != http.StatusBadRequest {
-		t.Error("Expected bad request, got:", rr.Code)
-	}
-	config.GlobalConfig.ProtocPath = "echo"
-
 	tt := []struct {
 		routeNameVar    string
 		routeVersionVar string
@@ -108,6 +86,9 @@ func TestPostProtoHandler(t *testing.T) {
 			Name:    x.routeNameVar,
 			Version: x.routeVersionVar,
 			Body:    x.routeBodyVar,
+			RemoteDepends: []*protobuf.ProtoDependency{
+				{URL: "github.com/googleapis/api-common-protos"},
+			},
 		}
 		out, err := json.Marshal(r)
 		if err != nil {
@@ -166,6 +147,9 @@ func TestPutProtoHandler(t *testing.T) {
 			Name:    x.routeNameVar,
 			Version: x.routeVersionVar,
 			Body:    x.routeBodyVar,
+			RemoteDepends: []*protobuf.ProtoDependency{
+				{URL: "github.com/googleapis/api-common-protos"},
+			},
 		}
 		out, err := json.Marshal(r)
 		if err != nil {

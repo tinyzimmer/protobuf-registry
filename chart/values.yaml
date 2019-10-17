@@ -6,6 +6,7 @@ replicaCount: 1
 
 config:
   preCachedRemotes: []
+  uiRedirectAll: true
 
 image:
   repository: tinyzimmer/protobuf-registry

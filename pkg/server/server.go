@@ -20,13 +20,17 @@ package server
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
+	"os"
 	"time"
 
 	"github.com/go-logr/glogr"
 	"github.com/gorilla/mux"
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 	"github.com/tinyzimmer/protobuf-registry/pkg/database"
+	"github.com/tinyzimmer/protobuf-registry/pkg/remotecache"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/apirouter"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/gemrouter"
@@ -64,6 +68,30 @@ func New() (CoreServer, error) {
 	}
 
 	return srvr, nil
+}
+
+// NewTestServer returns a test server for client testing - The URL attribute
+// of the returned server can be passed to an http.Client. The returned function
+// will close the server and remove the temporary file storage.
+func NewTestServer() (*httptest.Server, func(), error) {
+	config.SafeInit()
+	config.GlobalConfig.ProtocPath = "echo"
+	config.GlobalConfig.FileStoragePath, _ = ioutil.TempDir("", "")
+	var ctrl *common.ServerController
+	var err error
+	srvr := &coreServer{}
+	if ctrl, err = srvr.InitController(config.GlobalConfig); err != nil {
+		return nil, nil, err
+	}
+	if err := remotecache.InitCache(); err != nil {
+		return nil, nil, err
+	}
+	ts := httptest.NewServer(srvr.configureRouter(ctrl))
+	close := func() {
+		ts.Close()
+		os.RemoveAll(config.GlobalConfig.FileStoragePath)
+	}
+	return ts, close, nil
 }
 
 func (c *coreServer) InitController(conf *config.Config) (*common.ServerController, error) {

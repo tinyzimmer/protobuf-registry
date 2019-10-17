@@ -23,6 +23,7 @@ import (
 	dbcommon "github.com/tinyzimmer/protobuf-registry/pkg/database/common"
 	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 )
 
 func (api *apiServer) getAllProtoHandler(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +35,9 @@ func (api *apiServer) getAllProtoHandler(w http.ResponseWriter, r *http.Request)
 		common.BadRequest(err, w)
 		return
 	}
-	out := make([]map[string]interface{}, 0)
+	out := &types.ListProtoResponse{
+		Items: make([]*types.ProtoMeta, 0),
+	}
 	for name, protos := range protos {
 		// safety check that this isn't an empty slice
 		if len(protos) == 0 {
@@ -42,14 +45,14 @@ func (api *apiServer) getAllProtoHandler(w http.ResponseWriter, r *http.Request)
 		}
 		// sort the protobuf versions
 		protos = common.SortVersions(protos)
-		out = append(out, map[string]interface{}{
-			"name":           name,
-			"versions":       protos,
-			"latest":         protos[0].Version,
-			"latestUploaded": protos[0].LastUpdated,
+		out.Items = append(out.Items, &types.ProtoMeta{
+			Name:           name,
+			Versions:       protos,
+			Latest:         *protos[0].Version,
+			LatestUploaded: protos[0].LastUpdated,
 		})
 	}
-	common.WriteJSONResponse(out, w)
+	common.WriteJSONResponse(out.Items, w)
 }
 
 func (api *apiServer) getProtoHandler(w http.ResponseWriter, r *http.Request) {
@@ -90,10 +93,12 @@ func (api *apiServer) getProtoVersionMetaHandler(w http.ResponseWriter, r *http.
 		common.NotFound(err, w)
 		return
 	}
+	log.Info("Fetching descriptor sets from storage")
 	if proto, err = api.Storage().GetRawProto(proto); err != nil {
 		common.BadRequest(err, w)
 		return
 	}
+	log.Info("Gathering protobuf descriptors")
 	out, err := proto.Descriptors()
 	if err != nil {
 		common.BadRequest(err, w)

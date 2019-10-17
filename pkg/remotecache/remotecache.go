@@ -27,7 +27,6 @@ import (
 
 	"github.com/go-logr/glogr"
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
-	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 )
 
 var cache *RemoteCache
@@ -42,10 +41,7 @@ func InitCache() error {
 	}
 	for _, x := range config.GlobalConfig.PreCachedRemotes {
 		log.Info(fmt.Sprintf("Updating remote dependency cache for: %s", x))
-		if _, err := cache.GetGitDependency(&types.ProtoDependency{
-			URL:      x,
-			Revision: "master",
-		}); err != nil {
+		if _, err := cache.GetGitDependency(x, "", "master"); err != nil {
 			return err
 		} else {
 			log.Info(fmt.Sprintf("Fetched remote dependency: %s", x))

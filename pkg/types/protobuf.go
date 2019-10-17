@@ -23,28 +23,39 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"time"
+
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
 )
 
 const defaultVersion = "0.0.1"
 const defaultRevision = "master"
 
+type ListProtoResponse struct {
+	Items []*ProtoMeta
+}
+
+type ProtoMeta struct {
+	Name           string               `json:"name"`
+	Versions       []*protobuf.Protobuf `json:"versions"`
+	Latest         string               `json:"latest"`
+	LatestUploaded time.Time            `json:"latestUploaded"`
+}
+
+type GetFileContentsResponse struct {
+	Content string `json:"content"`
+}
+
 type PostProtoRequest struct {
-	ID            string             `json:"id,omitempty"`
-	Name          string             `json:"name,omitempty"`
-	Body          string             `json:"body,omitempty"`
-	Version       string             `json:"version,omitempty"`
-	RemoteDepends []*ProtoDependency `json:"remoteDeps,omitempty"`
+	ID            string                      `json:"id,omitempty"`
+	Name          string                      `json:"name,omitempty"`
+	Body          string                      `json:"body,omitempty"`
+	Version       string                      `json:"version,omitempty"`
+	RemoteDepends []*protobuf.ProtoDependency `json:"remoteDeps,omitempty"`
 }
 
 type PutRemoteRequest struct {
 	URL string `json:"url"`
-}
-
-type ProtoDependency struct {
-	URL      string   `json:"url,omitempty"`
-	Revision string   `json:"revision,omitempty"`
-	Path     string   `json:"path,omitempty"`
-	Ignores  []string `json:"ignores,omitempty"`
 }
 
 func NewProtoReqFromReader(rdr io.ReadCloser) (*PostProtoRequest, error) {
@@ -54,7 +65,7 @@ func NewProtoReqFromReader(rdr io.ReadCloser) (*PostProtoRequest, error) {
 	defer rdr.Close()
 	req := PostProtoRequest{
 		Version:       defaultVersion,
-		RemoteDepends: make([]*ProtoDependency, 0),
+		RemoteDepends: make([]*protobuf.ProtoDependency, 0),
 	}
 	body, err := ioutil.ReadAll(rdr)
 	if err != nil {
@@ -79,4 +90,14 @@ func (req *PostProtoRequest) Validate() error {
 		}
 	}
 	return nil
+}
+
+// NewFromRequest converts a PostProtoRequest to a bare protobuf object
+func NewProtoFromRequest(req *PostProtoRequest) *protobuf.Protobuf {
+	return &protobuf.Protobuf{
+		ID:           &req.ID,
+		Name:         &req.Name,
+		Version:      &req.Version,
+		Dependencies: req.RemoteDepends,
+	}
 }

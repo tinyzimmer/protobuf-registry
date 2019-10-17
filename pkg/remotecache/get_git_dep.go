@@ -22,25 +22,24 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 	"gopkg.in/src-d/go-git.v4"
 )
 
-func (c *RemoteCache) GetGitDependency(dep *types.ProtoDependency) (gdep *GitDependency, err error) {
+func (c *RemoteCache) GetGitDependency(url, path, revision string) (gdep *GitDependency, err error) {
 	c.mux.Lock()
 	defer c.mux.Unlock()
-	cloneURL, subPath, err := resolveURL(dep.URL)
+	cloneURL, subPath, err := resolveURL(url)
 	if err != nil {
 		return
 	}
-	path := filepath.Join(c.cacheRoot, cloneURL.Path)
+	outPath := filepath.Join(c.cacheRoot, cloneURL.Path)
 	// check if we already have a cached clone
-	if _, err = os.Stat(path); err == nil {
+	if _, err = os.Stat(outPath); err == nil {
 		gdep = &GitDependency{
-			LocalPath:    path,
+			LocalPath:    outPath,
 			LocalSubPath: subPath,
-			Revision:     dep.Revision,
-			ImportPath:   dep.Path,
+			Revision:     revision,
+			ImportPath:   path,
 		}
 		err = gdep.Checkout()
 		return
@@ -49,17 +48,17 @@ func (c *RemoteCache) GetGitDependency(dep *types.ProtoDependency) (gdep *GitDep
 		URL: cloneURL.String(),
 	}
 	log.Info(fmt.Sprintf("Cloning %s", cloneOpts.URL))
-	_, err = git.PlainClone(path, false, cloneOpts)
+	_, err = git.PlainClone(outPath, false, cloneOpts)
 	if err != nil {
 		return
 	}
 	gdep = &GitDependency{
-		LocalPath:    path,
+		LocalPath:    outPath,
 		LocalSubPath: subPath,
-		Revision:     dep.Revision,
-		ImportPath:   dep.Path,
+		Revision:     revision,
+		ImportPath:   path,
 	}
-	log.Info(fmt.Sprintf("Checking out %s of %s", dep.Revision, dep.URL))
+	log.Info(fmt.Sprintf("Checking out %s of %s", revision, url))
 	err = gdep.Checkout()
 	return
 }

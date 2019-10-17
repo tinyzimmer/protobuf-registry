@@ -20,19 +20,19 @@ package apirouter
 import (
 	"net/http"
 
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
 	"github.com/tinyzimmer/protobuf-registry/pkg/remotecache"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
-	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 )
 
 func (api *apiServer) putNewRemote(w http.ResponseWriter, r *http.Request) {
-	var req types.ProtoDependency
+	var req protobuf.ProtoDependency
 	if err := common.UnmarshallInto(r.Body, &req); err != nil {
 		common.BadRequest(err, w)
 		return
 	}
 	log.Info("Requesting to cache new remote", "remote", req.URL)
-	if _, err := remotecache.Cache().GetGitDependency(&types.ProtoDependency{URL: req.URL, Revision: "master"}); err != nil {
+	if _, err := remotecache.Cache().GetGitDependency(req.URL, "", "master"); err != nil {
 		common.BadRequest(err, w)
 		return
 	}

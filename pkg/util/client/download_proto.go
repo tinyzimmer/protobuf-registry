@@ -17,22 +17,21 @@
 
 package client
 
-import "testing"
+import (
+	"context"
+	"fmt"
+)
 
-// Placeholder tests for coverage
+// TODO: Validate format with switch
+func (r *registryClient) DownloadProtoPackage(name, version, format string) ([]byte, error) {
+	return r.DownloadProtoPackageWithContext(context.Background(), name, version, format)
+}
 
-func TestClient(t *testing.T) {
-	client := New("test-url")
-	client.GetServerConfig()
-	client.UploadProtoPackage(nil, false)
-	client.UploadProtoPackageFromDir("", false)
-	client.GetProtoPackageVersions("test")
-	client.DeleteAllProtoPackageVersions("test")
-	client.GetProtoPackage("test", "0.0.1")
-	client.DeleteProtoPackage("test", "0.0.1")
-	client.DownloadProtoPackage("test", "0.0.1", "raw")
-	client.GetFileContents("test", "0.0.1", "testmessage.proto")
-	client.GetFileDocs("test", "0.0.1", "testmessage.proto")
-	client.GetCachedRemotes()
-	client.PutCachedRemote("test-remote")
+func (r *registryClient) DownloadProtoPackageWithContext(ctx context.Context, name, version, format string) ([]byte, error) {
+	path := fmt.Sprintf("api/proto/%s/%s/%s", name, version, format)
+	req, err := r.newRequest(ctx, "GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	return r.doRaw(req)
 }

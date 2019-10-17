@@ -25,8 +25,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
 	"github.com/tinyzimmer/protobuf-registry/pkg/remotecache"
-	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 )
 
 func TestGetRemotes(t *testing.T) {
@@ -78,7 +78,7 @@ func TestPutRemotes(t *testing.T) {
 
 	for _, x := range tt {
 		path := fmt.Sprintf("/api/remotes")
-		r := types.ProtoDependency{
+		r := protobuf.ProtoDependency{
 			URL: x.routeURLVar,
 		}
 		out, err := json.Marshal(r)

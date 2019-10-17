@@ -33,9 +33,9 @@ import (
 var GlobalConfig *Config
 var log = glogr.New()
 
-func Init() error {
+func Init(ignoreProtoc bool) error {
 	var err error
-	if GlobalConfig, err = newConfig(); err != nil {
+	if GlobalConfig, err = newConfig(ignoreProtoc); err != nil {
 		return err
 	}
 	return nil
@@ -43,9 +43,7 @@ func Init() error {
 
 // SafeInit is used from unit tests to ignore protoc
 func SafeInit() {
-	os.Setenv("IGNORE_PROTOC", "true")
-	_ = Init()
-	os.Unsetenv("IGNORE_PROTOC")
+	_ = Init(true)
 }
 
 type Config struct {
@@ -93,14 +91,14 @@ func (c *Config) JSON() []byte {
 }
 
 // newConfig parses the environment and cli flags for both go-flags and glogr
-func newConfig() (*Config, error) {
+func newConfig(ignoreProtoc bool) (*Config, error) {
 	c := &Config{}
 	parser := flags.NewParser(c, flags.Default|flags.PassAfterNonOption)
 	if _, err := parser.Parse(); err != nil {
 		return nil, err
 	}
 	out, err := exec.Command(c.ProtocPath, "--version").CombinedOutput()
-	if err != nil && !ignoreNoProtoc() {
+	if err != nil && !ignoreProtoc {
 		// hack for --help somehow getting set over the default protoc path
 		if !util.StringSliceContains(os.Args, "--help") {
 			log.Error(err, "No protoc at the provided path")
@@ -112,12 +110,6 @@ func newConfig() (*Config, error) {
 	// handle flags for logging
 	handleLogFlags()
 	return c, nil
-}
-
-// ignoreNoProtoc indicates that protoc not being present should be ignored -
-// used primarily for testing
-func ignoreNoProtoc() bool {
-	return strings.ToLower(os.Getenv("IGNORE_PROTOC")) == "true"
 }
 
 // handleLogFlags wipes out previous flags so we can just configure glogr -

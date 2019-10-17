@@ -21,7 +21,6 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 
@@ -38,14 +37,20 @@ func (f *fakeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func getServer(t *testing.T) CoreServer {
 	t.Helper()
-	os.Setenv("IGNORE_PROTOC", "true")
-	_ = config.Init()
+	config.SafeInit()
 	srvr, err := New()
 	if err != nil {
 		t.Fatal("Got error building server")
 	}
-	os.Unsetenv("IGNORE_PROTOC")
 	return srvr
+}
+
+func TestTestServer(t *testing.T) {
+	_, close, err := NewTestServer()
+	if err != nil {
+		t.Fatal("Expected to get test server, got:", err)
+	}
+	close()
 }
 
 func TestNew(t *testing.T) {

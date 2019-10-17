@@ -45,11 +45,17 @@ spec:
         {{- end }}
           env:
             {{- if .Values.persistence.enabled }}
-            - name: PROTO_REGISTRY_PERSIST_MEMORY
+            - name: PERSIST_MEMORY
               value: "true"
             {{- end }}
-            - name: PROTO_REGISTRY_PRE_CACHED_REMOTES
+            {{- if .Values.config.preCachedRemotes }}
+            - name: PRE_CACHED_REMOTES
               value: {{ range $index, $element := .Values.config.preCachedRemotes }}{{ if $index }},{{ end }}{{ $element }}{{ end }}
+            {{- end }}
+            {{- if .Values.config.uiRedirectAll }}
+            - name: UI_REDIRECT_ALL
+              value: "true"
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /healthz

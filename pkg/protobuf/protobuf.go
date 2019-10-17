@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/go-logr/glogr"
-	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 )
 
 var log = glogr.New()
@@ -36,25 +35,22 @@ var log = glogr.New()
 // for utility functions across different packages. Storage and Database providers
 // are responsible for setting, storing, and retrieving the raw data.
 type Protobuf struct {
-	ID           *string                  `json:"id"`
-	Name         *string                  `json:"name"`
-	Version      *string                  `json:"version"`
-	LastUpdated  time.Time                `json:"lastUpdated"`
-	Dependencies []*types.ProtoDependency `json:"dependencies"`
+	ID           *string            `json:"id"`
+	Name         *string            `json:"name"`
+	Version      *string            `json:"version"`
+	LastUpdated  time.Time          `json:"lastUpdated"`
+	Dependencies []*ProtoDependency `json:"dependencies"`
 	// raw zip bytes
 	raw []byte
 	// raw descriptor set bytes
 	descriptor []byte
 }
 
-// NewFromRequest converts a PostProtoRequest to a bare protobuf object
-func NewFromRequest(req *types.PostProtoRequest) *Protobuf {
-	return &Protobuf{
-		ID:           &req.ID,
-		Name:         &req.Name,
-		Version:      &req.Version,
-		Dependencies: req.RemoteDepends,
-	}
+type ProtoDependency struct {
+	URL      string   `json:"url,omitempty"`
+	Revision string   `json:"revision,omitempty"`
+	Path     string   `json:"path,omitempty"`
+	Ignores  []string `json:"ignores,omitempty"`
 }
 
 // SetRawFromBase64 sets the raw protobuf data from a base64 string

@@ -36,13 +36,13 @@ func (api *apiServer) processReq(req *types.PostProtoRequest, force bool) (proto
 
 	// Create a protobuf object from the request
 	log.Info("Validating protocol specification...")
-	proto = protobuf.NewFromRequest(req)
+	proto = types.NewProtoFromRequest(req)
 	if err = proto.SetRawFromBase64(req.Body); err != nil {
 		return
 	}
 
 	// compile and set the descirptor set
-	if err = proto.CompileDescriptorSet(); err != nil {
+	if err = proto.CompileToDescriptorSet(); err != nil {
 		return
 	}
 

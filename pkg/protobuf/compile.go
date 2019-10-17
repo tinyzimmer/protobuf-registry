@@ -18,57 +18,46 @@
 package protobuf
 
 import (
-	"context"
-	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 
-	"github.com/tinyzimmer/protobuf-registry/pkg/config"
+	"github.com/golang/protobuf/proto"
+	"github.com/jhump/protoreflect/desc"
+	"github.com/jhump/protoreflect/desc/protoparse"
 	"github.com/tinyzimmer/protobuf-registry/pkg/remotecache"
 )
 
-func (p *Protobuf) CompileDescriptorSet() error {
-	var importPaths []string
-	if len(p.Dependencies) > 0 {
-		for _, remoteDep := range p.Dependencies {
-			dep, err := remotecache.Cache().GetGitDependency(remoteDep)
-			if err != nil {
-				return err
-			}
-			importPaths = append(importPaths, dep.Dir())
-		}
+func (p *Protobuf) CompileToDescriptorSet() error {
+	parser := &protoparse.Parser{
+		ImportPaths:           make([]string, 0),
+		IncludeSourceCodeInfo: true,
 	}
 	tempPath, _, tempFiles, err := p.newTempFilesFromRaw(false)
 	if err != nil {
 		return err
 	}
 	defer os.RemoveAll(tempPath)
-	importPaths = append(importPaths, tempPath)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.GlobalConfig.CompileTimeout)*time.Second)
-	defer cancel()
-
-	args := make([]string, 0)
-	for _, x := range importPaths {
-		args = append(args, fmt.Sprintf("-I=%s", x))
+	parser.ImportPaths = append(parser.ImportPaths, tempPath)
+	if len(p.Dependencies) > 0 {
+		for _, remoteDep := range p.Dependencies {
+			dep, err := remotecache.Cache().GetGitDependency(remoteDep.URL, remoteDep.Path, remoteDep.Revision)
+			if err != nil {
+				return err
+			}
+			parser.ImportPaths = append(parser.ImportPaths, dep.Dir())
+		}
 	}
-	args = append(args, []string{
-		"--include_imports",
-		"--include_source_info",
-		fmt.Sprintf("--descriptor_set_out=%s", os.Stdout.Name()),
-	}...)
-	args = append(args, tempFilesToStrings(tempFiles, "")...)
-	out, err := exec.CommandContext(ctx,
-		config.GlobalConfig.ProtocPath,
-		args...,
-	).CombinedOutput()
+	resolved, err := protoparse.ResolveFilenames(parser.ImportPaths, tempFilesToStrings(tempFiles, "")...)
 	if err != nil {
-		return fmt.Errorf("failed to compile protocol spec: %s", string(out))
+		return err
 	}
-	p.descriptor = out
+	fds, err := parser.ParseFiles(resolved...)
+	if err != nil {
+		return err
+	}
+	set := desc.ToFileDescriptorSet(fds...)
+	p.descriptor, err = proto.Marshal(set)
 	return err
 }
 

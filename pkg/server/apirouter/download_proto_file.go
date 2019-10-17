@@ -24,6 +24,7 @@ import (
 
 	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
+	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 )
 
 func getFileVars(r *http.Request, splitStr string) (name, version, filename string) {
@@ -57,9 +58,7 @@ func (api *apiServer) getRawProtoFile(w http.ResponseWriter, r *http.Request) {
 		common.BadRequest(err, w)
 		return
 	}
-	common.WriteJSONResponse(map[string]string{
-		"content": string(out),
-	}, w)
+	common.WriteJSONResponse(&types.GetFileContentsResponse{Content: string(out)}, w)
 }
 
 func (api *apiServer) getMetaForProtoFile(w http.ResponseWriter, r *http.Request) {

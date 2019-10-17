@@ -102,21 +102,21 @@ For example, `PRE_CACHED_REMOTES="github.com/googleapis/api-common-protos"`.
 The image can be configured via environment variables or on the command-line.
 Options are limited right now, but it is setup in a way to easily add new interfaces for different backends.
 
-| Name                              | Default                   |Description                                                        |
-|:---------------------------------:|:-------------------------:|:------------------------------------------------------------------|
-|`BIND_ADDRESS`      |`0.0.0.0:8080`             |The address and port to bind to.                                                  |
-|`READ_TIMEOUT`      | `15`                      |Read timeout for API/UI `HTTP` requests.                                          |
-|`WRITE_TIMEOUT`     | `15`                      |Write timeout for API/UI `HTTP` requests.                                         |
-|`COMPILE_TIMEOUT`   | `10`                      |Timeout for `protoc` invocations.                                                 |
-|`PROTOC_PATH`       | `/usr/bin/protoc`         |Path to the `protoc` executable. Leave unchanged in docker image.                 |
+| Name                              | Default                   |Description                                                         |
+|:---------------------------------:|:-------------------------:|:-------------------------------------------------------------------|
+|`BIND_ADDRESS`      |`0.0.0.0:8080`             |The address and port to bind to.                                                   |
+|`READ_TIMEOUT`      | `15`                      |Read timeout for API/UI `HTTP` requests.                                           |
+|`WRITE_TIMEOUT`     | `15`                      |Write timeout for API/UI `HTTP` requests.                                          |
+|`COMPILE_TIMEOUT`   | `10`                      |Timeout for `protoc` invocations.                                                  |
+|`PROTOC_PATH`       | `/usr/bin/protoc`         |Path to the `protoc` executable. Leave unchanged in docker image. Used for codegen.|
 |`PROTOC_GEN_GO_PATH`|`/opt/proto-registry/bin/protoc-gen-go` |The path to a compiled `protoc-gen-go` plugin until I can get gocode generation to work independently via its exported interfaces|
-|`DATABASE_DRIVER`   | `memory`                  |Driver to use for database operations, only `memory` currently.                   |
-|`STORAGE_DRIVER`    | `file`                    |Driver to use for file storage operations, only `file` currently.                 |
-|`FILE_STORAGE_PATH` | `/opt/proto-registry/data`|Path to file storage when using file storage driver.                              |
-|`PERSIST_MEMORY`    | `false`                   |Persist the in-memory database to disk after write operations.                    |
-|`PRE_CACHED_REMOTES`| `[]`                      |A comma-separated list of remote git repositories to pre-cache for compilations.  |
-|`UI_REDIRECT_ALL`   | `false`                   |Redirect all unknown routes to the UI. Useful to turn off for discovery debugging.|
-|`ENABLE_CORS`       | `false`                   |Enable CORS headers for API requests.                                             |
+|`DATABASE_DRIVER`   | `memory`                  |Driver to use for database operations, only `memory` currently.                    |
+|`STORAGE_DRIVER`    | `file`                    |Driver to use for file storage operations, only `file` currently.                  |
+|`FILE_STORAGE_PATH` | `/opt/proto-registry/data`|Path to file storage when using file storage driver.                               |
+|`PERSIST_MEMORY`    | `false`                   |Persist the in-memory database to disk after write operations.                     |
+|`PRE_CACHED_REMOTES`| `[]`                      |A comma-separated list of remote git repositories to pre-cache for compilations.   |
+|`UI_REDIRECT_ALL`   | `false`                   |Redirect all unknown routes to the UI. Useful to turn off for discovery debugging. |
+|`ENABLE_CORS`       | `false`                   |Enable CORS headers for API requests.                                              |
 
 The CLI equivalents line up to the environment variables (just as lowercase) for the most part. You can pass `--help` to the app or docker container to see all the options:
 
@@ -128,12 +128,10 @@ Coming soon
 
 #### TODO
 
- - [ ] dont use protoc for descriptor sets
- - [ ] unit tests
  - [ ] dev docs
  - [ ] validateOnly/linting on `POST /api/proto`
  - [ ] day theme/night theme
- - [ ] proto version compile options - or maybe worker nodes
+ - [ ] proto version codegen options - or maybe worker nodes
    - trying to keep the image small
 
 

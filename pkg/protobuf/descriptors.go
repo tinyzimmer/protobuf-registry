@@ -22,6 +22,7 @@ import (
 
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
 // ProtobufDescriptors is a more human readable representation of raw
@@ -49,7 +50,7 @@ func (p *Protobuf) Descriptors() (*ProtobufDescriptors, error) {
 	if err != nil {
 		return nil, err
 	}
-	//defer os.RemoveAll(tempPath)
+	log.Info("Creating response object from descriptors")
 	out := &ProtobufDescriptors{
 		Messages:     make([]*ProtobufMessage, 0),
 		SourceFiles:  make([]string, 0),
@@ -58,7 +59,9 @@ func (p *Protobuf) Descriptors() (*ProtobufDescriptors, error) {
 	}
 	for _, x := range descriptors {
 		out = appendPkgsFromDescriptor(out, x)
-		out.SourceFiles = append(out.SourceFiles, strings.TrimPrefix(x.GetName(), "/"))
+		if !util.StringSliceContains(out.SourceFiles, strings.TrimPrefix(x.GetName(), "/")) {
+			out.SourceFiles = append(out.SourceFiles, strings.TrimPrefix(x.GetName(), "/"))
+		}
 		for _, msg := range x.GetMessageTypes() {
 			out.Messages = append(out.Messages, protoMessageFromDescriptor(msg))
 		}
@@ -71,6 +74,7 @@ func (p *Protobuf) Descriptors() (*ProtobufDescriptors, error) {
 // formats
 func (p *Protobuf) GetDescriptors() (map[string]*desc.FileDescriptor, error) {
 	descriptorSet := new(descriptor.FileDescriptorSet)
+	log.Info("Unmarshaling descriptor set")
 	if err := descriptorSet.XXX_Unmarshal(p.DescriptorBytes()); err != nil {
 		return nil, err
 	}

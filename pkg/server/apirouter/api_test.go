@@ -31,6 +31,7 @@ import (
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 	"github.com/tinyzimmer/protobuf-registry/pkg/database"
 	"github.com/tinyzimmer/protobuf-registry/pkg/protobuf"
+	"github.com/tinyzimmer/protobuf-registry/pkg/remotecache"
 	"github.com/tinyzimmer/protobuf-registry/pkg/server/common"
 	"github.com/tinyzimmer/protobuf-registry/pkg/storage"
 	"github.com/tinyzimmer/protobuf-registry/pkg/types"
@@ -46,6 +47,9 @@ func getController(t *testing.T) (*common.ServerController, func()) {
 	config.GlobalConfig.FileStoragePath, _ = ioutil.TempDir("", "")
 	config.GlobalConfig.ProtocPath = "echo"
 	config.GlobalConfig.ProtobufVersion = "3.6.1"
+	if err := remotecache.InitCache(); err != nil {
+		t.Fatal(err)
+	}
 	ctrl := &common.ServerController{}
 	ctrl.SetDBEngine(database.GetEngine(config.GlobalConfig))
 	ctrl.SetStorageProvider(storage.GetProvider(config.GlobalConfig))
@@ -65,6 +69,9 @@ func addTestDataToServer(t *testing.T, srvr *apiServer) {
 		Name:    testProtoName,
 		Version: testProtoVersion,
 		Body:    protobuf.TestProtoZip,
+		RemoteDepends: []*protobuf.ProtoDependency{
+			{URL: "github.com/googleapis/api-common-protos"},
+		},
 	}
 	o, err := json.Marshal(r)
 	if err != nil {

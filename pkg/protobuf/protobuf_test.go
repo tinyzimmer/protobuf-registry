@@ -22,7 +22,6 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/tinyzimmer/protobuf-registry/pkg/types"
 	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
@@ -46,19 +45,6 @@ func newTestProtoWithData(t *testing.T) *Protobuf {
 	}
 	proto.SetDescriptor(desc)
 	return proto
-}
-
-func TestNewFromRequest(t *testing.T) {
-	req := &types.PostProtoRequest{
-		Name:    "test-proto",
-		Version: "0.0.1",
-	}
-	proto := NewFromRequest(req)
-	if *proto.Name != req.Name {
-		t.Error("Name was malformed, got:", *proto.Name)
-	} else if *proto.Version != req.Version {
-		t.Error("Version was malformed, got:", *proto.Version)
-	}
 }
 
 func TestSetRaw(t *testing.T) {

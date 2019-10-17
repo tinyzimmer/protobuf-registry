@@ -41,11 +41,10 @@ var defaults = map[string]interface{}{
 
 func TestInit(t *testing.T) {
 	os.Setenv("PROTOC_PATH", "/not/exists")
-	if err := Init(); err == nil {
+	if err := Init(false); err == nil {
 		t.Error("Expected error no protoc, got nil")
 	}
-	os.Setenv("IGNORE_PROTOC", "true")
-	if err := Init(); err != nil {
+	if err := Init(true); err != nil {
 		t.Error("Expected to ignore protoc, got:", err)
 	}
 	os.Unsetenv("PROTOC_PATH")
@@ -60,8 +59,7 @@ func TestInit(t *testing.T) {
 }
 
 func TestDefaults(t *testing.T) {
-	os.Setenv("IGNORE_PROTOC", "true")
-	c, err := newConfig()
+	c, err := newConfig(true)
 	if err != nil {
 		t.Error("Expected no error on new config, got:", err)
 		return

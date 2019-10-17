@@ -19,14 +19,12 @@ package protobuf
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	docreq "github.com/golang/protobuf/protoc-gen-go/plugin"
 	"github.com/jhump/protoreflect/desc"
 	docgen "github.com/pseudomuto/protoc-gen-doc"
-	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 	"github.com/tinyzimmer/protobuf-registry/pkg/util"
 )
 
@@ -51,10 +49,10 @@ func (p *Protobuf) DocJSON(filename string) ([]byte, error) {
 func generateDocs(desc *desc.FileDescriptor, descriptors map[string]*desc.FileDescriptor) ([]byte, error) {
 	plugin := &docgen.Plugin{}
 	req := &docreq.CodeGeneratorRequest{
-		FileToGenerate:  []string{desc.GetName()},
-		ProtoFile:       toFileDescriptorProtos(descriptors),
-		CompilerVersion: parseProtocVersion(),
-		Parameter:       util.StringPtr("json,docs.json"),
+		FileToGenerate: []string{desc.GetName()},
+		ProtoFile:      toFileDescriptorProtos(descriptors),
+		//CompilerVersion: parseProtocVersion(),
+		Parameter: util.StringPtr("json,docs.json"),
 	}
 	res, err := plugin.Generate(req)
 	if err != nil {
@@ -67,22 +65,22 @@ func generateDocs(desc *desc.FileDescriptor, descriptors map[string]*desc.FileDe
 	return out, nil
 }
 
-func intPtr(s string) *int32 {
-	i, _ := strconv.Atoi(s)
-	i32 := int32(i)
-	return &i32
-}
+// func intPtr(s string) *int32 {
+// 	i, _ := strconv.Atoi(s)
+// 	i32 := int32(i)
+// 	return &i32
+// }
 
-func parseProtocVersion() *docreq.Version {
-	spl := strings.Split(config.GlobalConfig.ProtobufVersion, " ")
-	vers := spl[len(spl)-1]
-	versSplit := strings.Split(vers, ".")
-	return &docreq.Version{
-		Major: intPtr(versSplit[0]),
-		Minor: intPtr(versSplit[1]),
-		Patch: intPtr(versSplit[2]),
-	}
-}
+// func parseProtocVersion() *docreq.Version {
+// 	spl := strings.Split(config.GlobalConfig.ProtobufVersion, " ")
+// 	vers := spl[len(spl)-1]
+// 	versSplit := strings.Split(vers, ".")
+// 	return &docreq.Version{
+// 		Major: intPtr(versSplit[0]),
+// 		Minor: intPtr(versSplit[1]),
+// 		Patch: intPtr(versSplit[2]),
+// 	}
+// }
 
 func toFileDescriptorProtos(descriptors map[string]*desc.FileDescriptor) []*descriptor.FileDescriptorProto {
 	var rawDescriptors []*descriptor.FileDescriptorProto
