@@ -98,6 +98,15 @@ This project was primarily just me being bored and wanting to build something, b
 
 ## Running
 
+If you have a Kubernetes cluster and want to just try it out on that, I made a quick and dirty helm chart.
+It doesn't support all the configuration options but for the most part you can just:
+
+```
+$> helm install --name proto-registry chart/
+```
+
+Refer to the `values.yaml` for the available options for now. 
+
 You can build and run the image locally with `make run` or there is a docker image available at `tinyzimmer/protobuf-registry`.
 
 Using docker:
@@ -136,7 +145,7 @@ If you have `go` installed and the server running at http://localhost:8080 then 
 If you don't have `go` installed, just look at the `hack/add_test_data.sh` script and swap out the parts that are commented with the line that invokes `util.go`.
 I used `util.go` to try out the client interface, but I left the commands that just use raw `zip` and `curl` calls in case those are easier.
 
-I may make a full CLI from the client interfaces in `pkg/util/client` at some point. 
+I may make a full CLI from the client interfaces in `pkg/util/client` at some point.
 
 ### Configuration
 
