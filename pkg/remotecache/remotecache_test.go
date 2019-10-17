@@ -25,6 +25,9 @@ import (
 	"github.com/tinyzimmer/protobuf-registry/pkg/config"
 )
 
+// TODO - tests with other remote imports since api-common-protos will
+// always be pre-cached
+
 func setConfig(t *testing.T) (rm func()) {
 	t.Helper()
 	config.SafeInit()
@@ -81,8 +84,8 @@ func TestGetRemotes(t *testing.T) {
 	if err != nil {
 		t.Fatal("Expected no error getting remotes, got:", err)
 	}
-	if len(remotes) != 0 {
-		t.Error("Expected empty list of remotes, got:", remotes)
+	if len(remotes) != 1 {
+		t.Error("Expected just api common protos, got:", remotes)
 	}
 
 	config.GlobalConfig.PreCachedRemotes = []string{"github.com/googleapis/api-common-protos"}

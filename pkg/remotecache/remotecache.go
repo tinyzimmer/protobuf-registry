@@ -33,15 +33,23 @@ var cache *RemoteCache
 
 var log = glogr.New()
 
+var APICommonProtos = "github.com/googleapis/api-common-protos"
+var DefaultBranch = "master"
+
 func InitCache() error {
 	log.Info("Initializing remote dependency cache, POST operations using remote dependencies will hang until this completes")
 	cache = newCache()
 	if err := os.MkdirAll(cache.cacheRoot, 0700); err != nil {
 		return err
 	}
+	// always pre-cache api-common-protos
+	log.Info(fmt.Sprintf("Fetching google common protocols"))
+	if _, err := cache.GetGitDependency(APICommonProtos, "", DefaultBranch); err != nil {
+		return err
+	}
 	for _, x := range config.GlobalConfig.PreCachedRemotes {
 		log.Info(fmt.Sprintf("Updating remote dependency cache for: %s", x))
-		if _, err := cache.GetGitDependency(x, "", "master"); err != nil {
+		if _, err := cache.GetGitDependency(x, "", DefaultBranch); err != nil {
 			return err
 		} else {
 			log.Info(fmt.Sprintf("Fetched remote dependency: %s", x))

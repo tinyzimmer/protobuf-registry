@@ -35,9 +35,6 @@ func doUpload(t *testing.T, client RegistryClient, version string) {
 		Name:    "test-proto",
 		Version: version,
 		Body:    protobuf.TestProtoZip,
-		RemoteDepends: []*protobuf.ProtoDependency{
-			{URL: "github.com/googleapis/api-common-protos"},
-		},
 	}, false)
 	if err != nil {
 		t.Fatal(err)
@@ -162,6 +159,7 @@ func TestClient(t *testing.T) {
 		t.Error("Expected list of one remote")
 	}
 
+	// TODO: use a different remote since api-common-protos is now always pre-cached
 	if err := client.PutCachedRemote(&types.PutRemoteRequest{URL: "github.com/googleapis/api-common-protos"}); err != nil {
 		t.Fatal(err)
 	}

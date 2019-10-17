@@ -69,9 +69,6 @@ func addTestDataToServer(t *testing.T, srvr *apiServer) {
 		Name:    testProtoName,
 		Version: testProtoVersion,
 		Body:    protobuf.TestProtoZip,
-		RemoteDepends: []*protobuf.ProtoDependency{
-			{URL: "github.com/googleapis/api-common-protos"},
-		},
 	}
 	o, err := json.Marshal(r)
 	if err != nil {

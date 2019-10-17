@@ -70,6 +70,8 @@ Package with remote imports
   ]
 }
 
+In this example, the Google common protocol buffer files are included as a remote import. However, this is not actually required because those files are automatically included when parsing new uploads.
+
 Note that packages with remote imports will seek to fetch them mid-flight if they are not already cached via /api/remotes or the environment.`,
 	},
 
