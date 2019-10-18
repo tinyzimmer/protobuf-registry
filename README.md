@@ -105,7 +105,7 @@ It doesn't support all the configuration options but for the most part you can j
 $> helm install --name proto-registry chart/
 ```
 
-Refer to the `values.yaml` for the available options for now. 
+Refer to the `values.yaml` for the available options for now.
 
 You can build and run the image locally with `make run` or there is a docker image available at `tinyzimmer/protobuf-registry`.
 
@@ -177,11 +177,16 @@ Coming soon
 #### TODO
 
  - [ ] dev docs
+ - [ ] fetch protoc as required only for codegen, and switch back to scratch image
  - [ ] validateOnly/linting on `POST /api/proto`
  - [ ] day theme/night theme
  - [ ] proto version codegen options - or maybe worker nodes
    - trying to keep the image small
 
+#### Special Thanks
+
+ - https://github.com/jhump/protoreflect - Protoreflect is an incredible library for dynamically parsing proto files and deserves special mention.
+ - https://github.com/pseudomuto/protoc-gen-doc - Great for generating documentation directly from .proto files in any format you desire.
 
 [build-img]: https://github.com/tinyzimmer/protobuf-registry/workflows/Build/badge.svg
 [test-img]: https://github.com/tinyzimmer/protobuf-registry/workflows/Test/badge.svg
